@@ -1,0 +1,69 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="Checkout Flow" id="PDwFuFtl_fYIKgbqu6y3">
+    <mxGraphModel dx="65472" dy="42337" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-1" target="BUjNOieHtYSfbBL8rDJi-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-1" value="User (Frontend)" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="-10" y="-310" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-2" target="BUjNOieHtYSfbBL8rDJi-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-2" value="API Gateway" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="190" y="-280" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-3" target="BUjNOieHtYSfbBL8rDJi-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-3" value="Cart Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" role="component" parent="1">
+          <mxGeometry x="420" y="-280" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-4" target="BUjNOieHtYSfbBL8rDJi-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-4" value="Order Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="425" y="-160" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-5" target="BUjNOieHtYSfbBL8rDJi-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-5" value="Kafka (Event Bus)" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="140" y="-160" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-6" target="BUjNOieHtYSfbBL8rDJi-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-6" value="Inventory Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="140" y="-40" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-7" target="BUjNOieHtYSfbBL8rDJi-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-7" value="Payment Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="140" y="80" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-8" target="BUjNOieHtYSfbBL8rDJi-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-8" value="Shipping Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="470" y="80" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-9" value="Notification Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="450" y="250" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-10" value="POST /checkout" style="endArrow=block;strokeWidth=1.5;fontSize=12;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-1" target="BUjNOieHtYSfbBL8rDJi-2" />
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-11" value="GET /cart" style="endArrow=block;strokeWidth=1.5;fontSize=12;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-2" target="BUjNOieHtYSfbBL8rDJi-3" />
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-12" value="createOrder()" style="endArrow=block;strokeWidth=1.5;fontSize=12;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-2" target="BUjNOieHtYSfbBL8rDJi-4" />
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-13" value="order.created" style="endArrow=block;strokeWidth=1.5;fontSize=12;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-4" target="BUjNOieHtYSfbBL8rDJi-5" />
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-14" value="consume: order.created" style="endArrow=block;strokeWidth=1.5;fontSize=12;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-5" target="BUjNOieHtYSfbBL8rDJi-6" />
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-15" value="consume: inventory.reserved" style="endArrow=block;strokeWidth=1.5;fontSize=12;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-5" target="BUjNOieHtYSfbBL8rDJi-7" />
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-16" value="inventory.reserved / failed" style="endArrow=block;strokeWidth=1.5;fontSize=12;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-6" target="BUjNOieHtYSfbBL8rDJi-5" />
+        <mxCell id="BUjNOieHtYSfbBL8rDJi-17" value="payment.succeeded / failed" style="endArrow=block;strokeWidth=1.5;fontSize=12;" edge="1" parent="1" source="BUjNOieHtYSfbBL8rDJi-7" target="BUjNOieHtYSfbBL8rDJi-5" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
