@@ -1,251 +1,312 @@
-�
-� SmartCart — eCommerce
-Platform
-Technical Documentation v1.0
-▶ 📌 Overview
-A single-vendor eCommerce web application built for independent sellers —
-offering a clean storefront for customers and a powerful admin panel for
-product control.
-Stack
-Angular SPA
-Spring Boot
-Spring Security JWT
-MySQL
-JPA / Hibernate
-Timeline
-MVP 23 months
-▶ 󾠮 Goals & Objectives
-▶ 🎯 Business Goals
-Launch MVP within 23 months
-Enable complete end-to-end purchase flow
-Provide full product control for admins
-▶ 🛠 Technical Goals
+🛒 SmartCart — eCommerce Platform
+
+
+A modern single-vendor eCommerce platform designed for independent sellers, featuring a clean customer storefront and a powerful admin panel for product and order management.
+
+📌 Overview
+
+SmartCart is a full-stack web application that enables customers to browse products, manage carts, and place orders securely.
+
+The system is built with scalable architecture using a Modular Monolith design, making it ready for future microservices extraction.
+
+🧱 Tech Stack
+Layer	Technology
+Frontend	Angular (SPA)
+Backend	Spring Boot
+Security	Spring Security + JWT
+ORM	JPA / Hibernate
+Database	MySQL
+Language	Java 17
+🎯 Goals & Objectives
+Business Goals
+
+Launch MVP within 2–3 months
+
+Provide end-to-end purchase flow
+
+Enable complete product control for admins
+
+Technical Goals
+
 Stateless JWT authentication
-1
-🛒
- SmartCart — eCommerce Platform
-RESTful API (resource-oriented design)
-Modular Monolith backend
-Scalable & microservice-ready structure
+
+RESTful API design
+
+Modular Monolith architecture
+
+Scalable microservice-ready structure
+
 Clean Angular component architecture
-▶ 󾠯 Target Users
-▶ 👤 Customer
-Needs
+
+👥 Target Users
+👤 Customer
+
+Customers can:
+
 Browse products
+
 Search products
-Add to cart
+
+Add items to cart
+
 Checkout securely
+
 View order history
-▶  Admin
-Needs
+
+👨‍💼 Admin
+
+Admins can:
+
 Add products
+
 Update product details
+
 Delete products
+
 Monitor orders
-▶ 󾠰 User Stories
-▶ 🛍 Customer Stories
-As a customer, I want to browse products so that I can see available items.
-As a customer, I want to search products to find specific items.
-As a customer, I want to add items to cart so I can purchase multiple products.
-2
-🛒
- SmartCart — eCommerce Platform
-As a customer, I want secure checkout to complete my purchase.
-▶ ⚙ Admin Stories
-As an admin, I want to add new products so they appear in the store.
-As an admin, I want to update product details so information stays accurate.
-As an admin, I want to delete products when unavailable.
-▶ 󾠱 Functional Requirements
-▶ 🔐 Authentication Module
-POST 
-/register
- — Public
-POST 
-/login
- — Public (returns JWT
-▶ 📦 Product Module
-GET 
-/products
- — Public (paginated)
-POST 
-/products
- — Admin
-PUT 
-/products/{id}
- — Admin
-DELETE 
-/products/{id}
- — Admin
-▶ 🛒 Cart Module
-POST 
-/cart/add
- — Authenticated
-DELETE 
-/cart/{itemId}
- — Authenticated
-PATCH 
-/cart/{itemId}
- — Authenticated
-▶ 💳 Checkout Module
-POST 
-/orders
- — Authenticated
-Creates order record
-Clears cart
-▶󾠲
-3
-🛒
- SmartCart — eCommerce Platform
-▶ 󾠲 Non-Functional Requirements
-▶ ⚡ Performance
+
+📚 User Stories
+🛍 Customer
+
+Browse available products
+
+Search for specific items
+
+Add products to cart
+
+Securely checkout orders
+
+⚙ Admin
+
+Add new products to the store
+
+Update product information
+
+Remove unavailable products
+
+⚙ Functional Requirements
+🔐 Authentication
+Endpoint	Access
+POST /register	Public
+POST /login	Public
+📦 Product Module
+Endpoint	Access
+GET /products	Public
+POST /products	Admin
+PUT /products/{id}	Admin
+DELETE /products/{id}	Admin
+🛒 Cart Module
+Endpoint	Access
+POST /cart/add	Authenticated
+DELETE /cart/{itemId}	Authenticated
+PATCH /cart/{itemId}	Authenticated
+💳 Checkout
+Endpoint	Access
+POST /orders	Authenticated
+
+Behavior
+
+Creates order
+
+Clears user cart
+
+⚡ Non-Functional Requirements
+Performance
+
 Page load < 2 seconds
+
 API response < 500ms
+
 Pagination enforced
-▶ 🔐 Security
+
+Security
+
 BCrypt password hashing
-JWT expiration & validation
-Input validation Bean Validation)
-Prepared statements SQL injection protection)
-▶ 📱 Usability
-100% responsive Angular frontend
+
+JWT authentication
+
+Input validation
+
+SQL injection protection
+
+Usability
+
+Fully responsive Angular UI
+
 Mobile-first design
-▶ 🪵 Observability
+
+Observability
+
 Structured logging
+
 Consistent API error responses
-▶ 󾠳 Technology Stack
-▶ ☕ Backend
-Java 17 LTS
-Spring Boot
-Spring Security JWT
-JPA / Hibernate
-MySQL 3NF normalized schema)
-4
-🛒
- SmartCart — eCommerce Platform
-▶ 🅰 Frontend
-Angular SPA
-Angular HttpClient
-▶ ⚙ Configuration Example
-spring.datasource.url=jdbc:mysql://localhost/smartcart
-spring.jpa.hibernate.ddl-auto=update
-jwt.expiration=86400000
-jwt.secret=your-secret-key
-server.port=8080
-▶ 󾠴 Architecture
-▶ 🏗 Architectural Style
+
+🏗 Architecture
+Architectural Style
+
 Modular Monolith
-Single deployable application divided into bounded internal modules.
-Ready for future microservices extraction.
-▶ 🖥 Layered Structure
+
+A single deployable application divided into bounded internal modules, allowing future migration to microservices.
+
+System Architecture
 Client Layer
+   │
+   ▼
 Angular SPA
-⬇ HTTPS / REST
-API Layer
-⬇
-Spring Boot Controllers
-Spring Security JWT Filter Layer)
+   │
+HTTPS / REST
+   │
+   ▼
+Spring Boot API Layer
+   │
+Spring Security (JWT)
+   │
+   ▼
 Business Modules
-5
-🛒
- SmartCart — eCommerce Platform
-User Module
-Product Module
-Cart Module
-Order Module
-Admin Module
-⬇ JPA
+   ├── User Module
+   ├── Product Module
+   ├── Cart Module
+   ├── Order Module
+   └── Admin Module
+   │
+   ▼
 Data Layer
 MySQL Database
-▶ 🧠 Module Responsibilities
-▶ User Module
+🧠 Module Responsibilities
+User Module
+
 Authentication
-Role management ADMIN / CUSTOMER
-JWT issuance
-▶ Product Module
-CRUD operations
+
+Role management (ADMIN / CUSTOMER)
+
+JWT token generation
+
+Product Module
+
+Product CRUD operations
+
 Pagination
+
 Indexed search
-▶ Cart Module
+
+Cart Module
+
 Per-user cart
+
 Quantity management
+
 Real-time total calculation
-▶ Order Module
+
+Order Module
+
 Order creation
+
 Order item persistence
-6
-🛒
- SmartCart — eCommerce Platform
-Status lifecycle tracking
-▶ Admin Module
+
+Order lifecycle tracking
+
+Admin Module
+
 Product management
+
 Order monitoring
-▶ 󾠵 Database Design
-▶ 📊 Schema Strategy
-Fully normalized 3NF
-Indexed columns:
+
+🗄 Database Design
+Schema Strategy
+
+Fully normalized 3NF schema
+
+Indexed Columns
+
 product.name
+
 product.category
-▶ 🔗 Relationships
-User 11 Cart
-Cart 1N CartItem
-CartItem N1 Product
-User 1N Order
-Order 1N OrderItem
-OrderItem N1 Product
-▶ 󾠶 Performance Optimization
-▶ 🧮 Pagination
-Spring 
-Pageable
- used for product listing.
-▶ 🔍 Indexing
-Indexes on product name & category.
-7
-🛒
- SmartCart — eCommerce Platform
-▶ 💤 Lazy Loading
-JPA relationships fetched on demand.
-▶ 🚫 N+1 Prevention
-Use 
+
+Relationships
+User 1 : 1 Cart
+Cart 1 : N CartItem
+CartItem N : 1 Product
+User 1 : N Order
+Order 1 : N OrderItem
+OrderItem N : 1 Product
+⚡ Performance Optimization
+Pagination
+
+Implemented using:
+
+Spring Pageable
+Indexing
+
+Indexes applied on:
+
+Product name
+
+Product category
+
+Lazy Loading
+
+JPA relationships loaded on demand
+
+N+1 Query Prevention
+
+Using:
+
 JOIN FETCH
- in JPQL when retrieving related entities.
-▶ 🔟 Scalability Roadmap
-▶ 🔀 Microservices Migration
-Modules can be extracted into:
+🚀 Scalability Roadmap
+
+Future enhancements include:
+
+Microservices Migration
+
+Possible service extraction:
+
 User Service
+
 Product Service
+
 Order Service
-▶ ⚡ Redis Caching
-Cache product catalog & search results.
-▶ 💰 Payment Gateway
-Stripe / PayPal integration.
-▶ 🌐 CDN Integration
-Offload product images to CloudFront or Cloudflare.
-▶ 󾠮󾠮 Risks & Mitigation
-▶ 🔴 High Risks
-Stock concurrency 
-→
- Use optimistic locking
-Security misconfiguration 
-→
- Security audit & environment secrets
-▶ 🟡 Medium Risks
-Cart state inconsistency 
-→
- Server-side cart
-8
-🛒
- SmartCart — eCommerce Platform
-Large catalog performance 
-→
- Indexes + enforced pagination
-▶ 󾠮󾠯 Success Metrics
-▶ 📈 Product Metrics
+
+Redis Caching
+
+Cache:
+
+Product catalog
+
+Search results
+
+Payment Gateway
+
+Integration with:
+
+Stripe
+
+PayPal
+
+CDN
+
+Store product images using:
+
+CloudFront
+
+Cloudflare
+
+⚠ Risks & Mitigation
+Risk	Mitigation
+Stock concurrency	Optimistic locking
+Security misconfiguration	Security audit
+Cart inconsistency	Server-side cart
+Large catalog performance	Indexing + pagination
+📊 Success Metrics
+Product Metrics
+
 Order success rate
+
 Registered user growth
-▶ ⚙ Operational Metrics
-API  500ms
+
+Operational Metrics
+
+API response < 500ms
+
 Zero critical admin failures
-Zero critical CVEs
-9
-🛒
- SmartCart — eCommerce Platform
+
+Zero critical security vulnerabilities
