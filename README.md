@@ -1,207 +1,227 @@
-🛒 SmartCart — eCommerce Platform
+# 🛒 SmartCart — eCommerce Platform
 
+> A modern single-vendor eCommerce platform designed for independent sellers, featuring a clean customer storefront and a powerful admin panel for product and order management.
 
-A modern single-vendor eCommerce platform designed for independent sellers, featuring a clean customer storefront and a powerful admin panel for product and order management.
+---
 
-📌 Overview
+## 📌 Overview
 
 SmartCart is a full-stack web application that enables customers to browse products, manage carts, and place orders securely.
 
-The system is built with scalable architecture using a Modular Monolith design, making it ready for future microservices extraction.
+The system is built with scalable architecture using a **Modular Monolith** design, making it ready for future microservices extraction.
 
-🧱 Tech Stack
-Layer	Technology
-Frontend	Angular (SPA)
-Backend	Spring Boot
-Security	Spring Security + JWT
-ORM	JPA / Hibernate
-Database	MySQL
-Language	Java 17
+---
 
-# 🏗 System Design
+## 🧱 Tech Stack
 
-## Order Creation Flow
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Angular (SPA) |
+| Backend | Spring Boot |
+| Security | Spring Security + JWT |
+| ORM | JPA / Hibernate |
+| Database | MySQL |
+| Language | Java 17 |
 
-The following sequence diagram illustrates how an order is created in the system and how services interact to validate inventory, persist orders, and clear the cart.
+---
 
-![Order Creation Sequence Diagram](System Design/Sequence Diagram/Create Order Sequence Diagram.png)
+## 🏗 System Design
 
+### System Context Diagram
 
-### Flow Explanation
+Shows how the eCommerce system interacts with external systems and services.
+
+![System Context Diagram](System-Design/Context-Diagram/eCommerce-System-Context-Diagram.png)
+
+The system integrates with the following external services:
+- **Payment Gateway** — processes customer payments
+- **SSO System** — handles federated authentication
+- **Email Service** — sends order confirmations and notifications
+- **Analytics Service** — tracks user behavior and sales data
+- **Shipping Provider** — manages order delivery and tracking
+- **CDN** — routes users to the closest server for optimal performance
+
+---
+
+### Component Architecture
+
+Shows the internal modular breakdown of the eCommerce system.
+
+![Component Architecture Diagram](System-Design/Component-Module/Component-Architecture.png)
+
+The system is composed of five core internal modules — **User**, **Product**, **Cart**, **Order**, and **Admin** — all orchestrated through a central eCommerce application layer.
+
+---
+
+### Order Creation Flow
+
+The following diagrams illustrate how an order is created in the system — from the sequence of service interactions to the state transitions involved.
+
+#### Sequence Diagram
+
+![Order Creation Sequence Diagram](System-Design/Sequence-Diagram/Create-Order-Sequence-Diagram.png)
+
+#### State Diagram
+
+![Order Creation State Diagram](System-Design/State-Diagram/Create-Order-State-Diagram.png)
+
+#### Flow Explanation
 
 1. Customer sends `createOrder(cartId)` request.
-2. `OrderService` fetches the cart from `CartService`.
-3. For each cart item:
-   - `ProductService` validates product existence.
-   - `InventoryService` checks stock availability.
-4. If stock is unavailable → request fails with `409 OutOfStock`.
-5. If stock is available:
-   - Inventory is reduced.
-   - Order is persisted via `OrderRepo`.
-6. Order is created and returned to the customer.
-7. The cart is cleared after successful order creation.
+2. `OrderController` delegates to `OrderService.processOrder()`.
+3. `CartController.fetchCart()` retrieves the active cart.
+4. `ProductController` is called to validate each cart item.
+5. Stock availability is checked (`checkStock`):
+   - **No stock** → request terminates with `409 OutOfStock`.
+   - **Stock available** → `reduceStock` is called.
+6. `InventoryService` is invoked to apply the stock reduction.
+7. Order is persisted and returned to the customer.
+8. The cart is cleared after successful order creation.
 
-# 🧰 Tools & Technologies
+---
 
-## Backend
+## 🧰 Tools & Technologies
 
+### Backend
 - Java 17
 - Spring Boot
 - Spring Security (JWT)
 - JPA / Hibernate
 - MySQL
 
-## Frontend
-
+### Frontend
 - Angular SPA
 - Angular HttpClient
 
-## Architecture & Design
-
+### Architecture & Design
 - Modular Monolith Architecture
 - RESTful API Design
 - Sequence Diagrams
 - Database Normalization (3NF)
 
-## Dev Tools
-
-- Git
-- GitHub
+### Dev Tools
+- Git & GitHub
 - Maven
 - IntelliJ / VS Code
 
-🎯 Goals & Objectives
-Business Goals
+---
 
-Launch MVP within 2–3 months
+## 🎯 Goals & Objectives
 
-Provide end-to-end purchase flow
+### Business Goals
+- Launch MVP within 2–3 months
+- Provide end-to-end purchase flow
+- Enable complete product control for admins
 
-Enable complete product control for admins
+### Technical Goals
+- Stateless JWT authentication
+- RESTful API design
+- Modular Monolith architecture
+- Scalable microservice-ready structure
+- Clean Angular component architecture
 
-Technical Goals
+---
 
-Stateless JWT authentication
+## 👥 Target Users
 
-RESTful API design
+### 👤 Customer
+- Browse products
+- Search products
+- Add items to cart
+- Checkout securely
+- View order history
 
-Modular Monolith architecture
+### 👨‍💼 Admin
+- Add products
+- Update product details
+- Delete products
+- Monitor orders
 
-Scalable microservice-ready structure
+---
 
-Clean Angular component architecture
+## 📚 User Stories
 
-👥 Target Users
-👤 Customer
+### 🛍 Customer
+- Browse available products
+- Search for specific items
+- Add products to cart
+- Securely checkout orders
 
-Customers can:
+### ⚙ Admin
+- Add new products to the store
+- Update product information
+- Remove unavailable products
 
-Browse products
+---
 
-Search products
+## ⚙ Functional Requirements
 
-Add items to cart
+### 🔐 Authentication
 
-Checkout securely
+| Endpoint | Access |
+|----------|--------|
+| `POST /register` | Public |
+| `POST /login` | Public |
 
-View order history
+### 📦 Product Module
 
-👨‍💼 Admin
+| Endpoint | Access |
+|----------|--------|
+| `GET /products` | Public |
+| `POST /products` | Admin |
+| `PUT /products/{id}` | Admin |
+| `DELETE /products/{id}` | Admin |
 
-Admins can:
+### 🛒 Cart Module
 
-Add products
+| Endpoint | Access |
+|----------|--------|
+| `POST /cart/add` | Authenticated |
+| `DELETE /cart/{itemId}` | Authenticated |
+| `PATCH /cart/{itemId}` | Authenticated |
 
-Update product details
+### 💳 Checkout
 
-Delete products
+| Endpoint | Access |
+|----------|--------|
+| `POST /orders` | Authenticated |
 
-Monitor orders
+**Behavior:**
+- Creates order
+- Clears user cart
 
-📚 User Stories
-🛍 Customer
+---
 
-Browse available products
+## ⚡ Non-Functional Requirements
 
-Search for specific items
+### Performance
+- Page load < 2 seconds
+- API response < 500ms
+- Pagination enforced
 
-Add products to cart
+### Security
+- BCrypt password hashing
+- JWT authentication
+- Input validation
+- SQL injection protection
 
-Securely checkout orders
+### Usability
+- Fully responsive Angular UI
+- Mobile-first design
 
-⚙ Admin
+### Observability
+- Structured logging
+- Consistent API error responses
 
-Add new products to the store
+---
 
-Update product information
+## 🏗 Architecture
 
-Remove unavailable products
-
-⚙ Functional Requirements
-🔐 Authentication
-Endpoint	Access
-POST /register	Public
-POST /login	Public
-📦 Product Module
-Endpoint	Access
-GET /products	Public
-POST /products	Admin
-PUT /products/{id}	Admin
-DELETE /products/{id}	Admin
-🛒 Cart Module
-Endpoint	Access
-POST /cart/add	Authenticated
-DELETE /cart/{itemId}	Authenticated
-PATCH /cart/{itemId}	Authenticated
-💳 Checkout
-Endpoint	Access
-POST /orders	Authenticated
-
-Behavior
-
-Creates order
-
-Clears user cart
-
-⚡ Non-Functional Requirements
-Performance
-
-Page load < 2 seconds
-
-API response < 500ms
-
-Pagination enforced
-
-Security
-
-BCrypt password hashing
-
-JWT authentication
-
-Input validation
-
-SQL injection protection
-
-Usability
-
-Fully responsive Angular UI
-
-Mobile-first design
-
-Observability
-
-Structured logging
-
-Consistent API error responses
-
-🏗 Architecture
-Architectural Style
-
-Modular Monolith
+### Architectural Style — Modular Monolith
 
 A single deployable application divided into bounded internal modules, allowing future migration to microservices.
 
-System Architecture
+```
 Client Layer
    │
    ▼
@@ -225,141 +245,80 @@ Business Modules
    ▼
 Data Layer
 MySQL Database
-🧠 Module Responsibilities
-User Module
+```
 
-Authentication
+### 🧠 Module Responsibilities
 
-Role management (ADMIN / CUSTOMER)
+| Module | Responsibilities |
+|--------|-----------------|
+| **User Module** | Authentication, role management (ADMIN / CUSTOMER), JWT token generation |
+| **Product Module** | Product CRUD operations, pagination, indexed search |
+| **Cart Module** | Per-user cart, quantity management, real-time total calculation |
+| **Order Module** | Order creation, order item persistence, order lifecycle tracking |
+| **Admin Module** | Product management, order monitoring |
 
-JWT token generation
+---
 
-Product Module
+## 🗄 Database Design
 
-Product CRUD operations
+### Schema Strategy
+- Fully normalized **3NF** schema
 
-Pagination
+### Indexed Columns
+- `product.name`
+- `product.category`
 
-Indexed search
+### Relationships
 
-Cart Module
-
-Per-user cart
-
-Quantity management
-
-Real-time total calculation
-
-Order Module
-
-Order creation
-
-Order item persistence
-
-Order lifecycle tracking
-
-Admin Module
-
-Product management
-
-Order monitoring
-
-🗄 Database Design
-Schema Strategy
-
-Fully normalized 3NF schema
-
-Indexed Columns
-
-product.name
-
-product.category
-
-Relationships
-User 1 : 1 Cart
-Cart 1 : N CartItem
-CartItem N : 1 Product
-User 1 : N Order
-Order 1 : N OrderItem
+```
+User     1 : 1  Cart
+Cart     1 : N  CartItem
+CartItem N : 1  Product
+User     1 : N  Order
+Order    1 : N  OrderItem
 OrderItem N : 1 Product
-⚡ Performance Optimization
-Pagination
+```
 
-Implemented using:
+---
 
-Spring Pageable
-Indexing
+## ⚡ Performance Optimization
 
-Indexes applied on:
+| Technique | Implementation |
+|-----------|---------------|
+| **Pagination** | Spring `Pageable` |
+| **Indexing** | Applied on `product.name` and `product.category` |
+| **Lazy Loading** | JPA relationships loaded on demand |
+| **N+1 Query Prevention** | `JOIN FETCH` |
 
-Product name
+---
 
-Product category
+## 🚀 Scalability Roadmap
 
-Lazy Loading
+| Enhancement | Details |
+|-------------|---------|
+| **Microservices Migration** | Extract User, Product, and Order services |
+| **Redis Caching** | Cache product catalog and search results |
+| **Payment Gateway** | Integrate Stripe / PayPal |
+| **CDN** | Store product images via CloudFront / Cloudflare |
 
-JPA relationships loaded on demand
+---
 
-N+1 Query Prevention
+## ⚠ Risks & Mitigation
 
-Using:
+| Risk | Mitigation |
+|------|-----------|
+| Stock concurrency | Optimistic locking |
+| Security misconfiguration | Security audit |
+| Cart inconsistency | Server-side cart |
+| Large catalog performance | Indexing + pagination |
 
-JOIN FETCH
-🚀 Scalability Roadmap
+---
 
-Future enhancements include:
+## 📊 Success Metrics
 
-Microservices Migration
+### Product Metrics
+- Order success rate
+- Registered user growth
 
-Possible service extraction:
-
-User Service
-
-Product Service
-
-Order Service
-
-Redis Caching
-
-Cache:
-
-Product catalog
-
-Search results
-
-Payment Gateway
-
-Integration with:
-
-Stripe
-
-PayPal
-
-CDN
-
-Store product images using:
-
-CloudFront
-
-Cloudflare
-
-⚠ Risks & Mitigation
-Risk	Mitigation
-Stock concurrency	Optimistic locking
-Security misconfiguration	Security audit
-Cart inconsistency	Server-side cart
-Large catalog performance	Indexing + pagination
-📊 Success Metrics
-Product Metrics
-
-Order success rate
-
-Registered user growth
-
-Operational Metrics
-
-API response < 500ms
-
-Zero critical admin failures
-
-Zero critical security vulnerabilities
+### Operational Metrics
+- API response < 500ms
