@@ -17,6 +17,59 @@ Security	Spring Security + JWT
 ORM	JPA / Hibernate
 Database	MySQL
 Language	Java 17
+
+# 🏗 System Design
+
+## Order Creation Flow
+
+The following sequence diagram illustrates how an order is created in the system and how services interact to validate inventory, persist orders, and clear the cart.
+
+![Order Creation Sequence Diagram](System Design/Sequence Diagram/Create Order Sequence Diagram.png)
+
+
+### Flow Explanation
+
+1. Customer sends `createOrder(cartId)` request.
+2. `OrderService` fetches the cart from `CartService`.
+3. For each cart item:
+   - `ProductService` validates product existence.
+   - `InventoryService` checks stock availability.
+4. If stock is unavailable → request fails with `409 OutOfStock`.
+5. If stock is available:
+   - Inventory is reduced.
+   - Order is persisted via `OrderRepo`.
+6. Order is created and returned to the customer.
+7. The cart is cleared after successful order creation.
+
+# 🧰 Tools & Technologies
+
+## Backend
+
+- Java 17
+- Spring Boot
+- Spring Security (JWT)
+- JPA / Hibernate
+- MySQL
+
+## Frontend
+
+- Angular SPA
+- Angular HttpClient
+
+## Architecture & Design
+
+- Modular Monolith Architecture
+- RESTful API Design
+- Sequence Diagrams
+- Database Normalization (3NF)
+
+## Dev Tools
+
+- Git
+- GitHub
+- Maven
+- IntelliJ / VS Code
+
 🎯 Goals & Objectives
 Business Goals
 
