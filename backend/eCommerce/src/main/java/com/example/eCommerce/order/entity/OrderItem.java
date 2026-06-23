@@ -19,15 +19,20 @@ public class OrderItem
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ORDER_ITEM_ID")
     private Long id;
 
+    @Column(name = "QUANTITY")
     private Long quantity;
 
+    @Column(name = "ITEM_PRICE")
     private BigDecimal unitPrice;
 
+    @Column(name = "PRODUCT_NAME")
     private String productName;
 
     @Setter(AccessLevel.NONE) // Cannot access set for this attribute
+    @Column(name = "TOTAL_PRICE")
     private BigDecimal totalPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
