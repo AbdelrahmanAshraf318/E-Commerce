@@ -59,7 +59,7 @@ public class Customer implements UserDetails
     @Column(name = "PHONE_NUMBER", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name = "IS_LOCKED", columnDefinition = "false")
+    @Column(name = "IS_LOCKED", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean locked;
 
     @OneToMany(
@@ -83,6 +83,9 @@ public class Customer implements UserDetails
             }
     )
     private List<Role> roles;
+
+    @Column(name = "IS_ENABLED", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean enabled;
 
     @Override
     public String getPassword()
