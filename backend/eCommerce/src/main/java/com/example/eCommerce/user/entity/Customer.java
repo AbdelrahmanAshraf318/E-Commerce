@@ -1,9 +1,10 @@
 package com.example.eCommerce.user.entity;
 
+import com.example.eCommerce.common.validatePhone.ValidPhoneNumber;
 import com.example.eCommerce.order.entity.Order;
 import com.example.eCommerce.user.role.Role;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -28,6 +29,7 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class) // an AOP to be called before OR after any changing on this entity
+@ValidPhoneNumber(phoneField = "phoneNumber", regionField = "region")
 public class Customer implements UserDetails
 {
     @Id // Mark the field to be primary key
@@ -42,6 +44,7 @@ public class Customer implements UserDetails
     @Column(name = "USERNAME", unique = true, nullable = false)
     private String username;
 
+
     @Column(name = "PASSWORD", nullable = false)
     @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$",
@@ -49,6 +52,7 @@ public class Customer implements UserDetails
     )
     private String password;
 
+    @Email
     @Column(name = "EMAIL", nullable = false, unique = true)
     private String email;
 
@@ -59,7 +63,10 @@ public class Customer implements UserDetails
     @Column(name = "PHONE_NUMBER", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name = "IS_LOCKED", columnDefinition = "false")
+    @Column(name = "REGION", nullable = false)
+    private String region;
+
+    @Column(name = "IS_LOCKED", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean locked;
 
     @OneToMany(
@@ -83,6 +90,9 @@ public class Customer implements UserDetails
             }
     )
     private List<Role> roles;
+
+    @Column(name = "IS_ENABLED", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean enabled;
 
     @Override
     public String getPassword()

@@ -1,4 +1,4 @@
-package com.example.eCommerce.common;
+package com.example.eCommerce.common.validatePhone;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;

@@ -1,6 +1,7 @@
 package com.example.eCommerce.user.services;
 
 import com.example.eCommerce.user.dtos.ChangePasswordRequest;
+import com.example.eCommerce.user.dtos.CreateUserRequest;
 import com.example.eCommerce.user.dtos.UpdateProfileRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +13,8 @@ public interface CustomerService extends UserDetailsService
 {
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+
+    void createCustomer(CreateUserRequest createUserRequest);
 
     void updateProfileInfo(UpdateProfileRequest updateProfileRequest, UUID userId);
 
