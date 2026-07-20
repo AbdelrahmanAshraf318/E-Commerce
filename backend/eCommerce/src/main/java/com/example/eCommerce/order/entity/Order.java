@@ -4,8 +4,6 @@ import com.example.eCommerce.order.enums.OrderStatus;
 import com.example.eCommerce.user.entity.Customer;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.util.CollectionUtils;
@@ -14,10 +12,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "ORDER")
+@Table(name = "ORDERS")
 public class Order
 {
     @Id
@@ -32,7 +31,8 @@ public class Order
     )
     private List<OrderItem> orderItem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CUSTOMER_ID")
     private Customer customer;
 
     @CreatedDate
@@ -43,7 +43,7 @@ public class Order
     @Column(name = "UPDATED_AT", insertable = false)
     private LocalDateTime updatedAt;
 
-    @Setter(AccessLevel.NONE) // Cannot access set for this attribute
+    @Setter(AccessLevel.NONE)
     @Column(name = "TOTAL_PRICE")
     private BigDecimal totalOrderPrice;
 

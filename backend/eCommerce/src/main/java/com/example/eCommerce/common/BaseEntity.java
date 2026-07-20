@@ -1,32 +1,37 @@
 package com.example.eCommerce.common;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
 /**
- * This notify spring that this class is not an entity itself and will not be mapped to a DB table.
+ * This notifies Spring that this class is not an entity itself and will not be mapped to a DB table.
  * BUT
- * Any class will extend this one will be an entity
+ * Any class that extends this one will be an entity.
  */
 @MappedSuperclass
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@SuperBuilder
 @EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class BaseEntity
 {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @CreatedDate
@@ -41,7 +46,7 @@ public class BaseEntity
     @Column(name = "CREATED_BY", nullable = false, updatable = false)
     private String createdBy;
 
-    @LastModifiedDate
+    @LastModifiedBy
     @Column(name = "LAST_MODIFIED_BY", insertable = false)
     private String lastModifiedBy;
 }

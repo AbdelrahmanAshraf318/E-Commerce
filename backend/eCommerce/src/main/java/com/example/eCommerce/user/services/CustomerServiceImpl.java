@@ -26,7 +26,7 @@ public class CustomerServiceImpl implements CustomerService
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
-        return this.customerRepo.findByUserNameIgnoreCase(username)
+        return this.customerRepo.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, username));
     }
 

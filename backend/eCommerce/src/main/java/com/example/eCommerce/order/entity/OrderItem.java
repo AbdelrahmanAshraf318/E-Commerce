@@ -1,20 +1,16 @@
 package com.example.eCommerce.order.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
-
 @Entity
 @Table(name = "ORDER_ITEMS")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class OrderItem
 {
     @Id
@@ -22,21 +18,21 @@ public class OrderItem
     @Column(name = "ORDER_ITEM_ID")
     private Long id;
 
-    @Column(name = "QUANTITY")
+    @Column(name = "QUANTITY", nullable = false)
     private Long quantity;
 
-    @Column(name = "ITEM_PRICE")
+    @Column(name = "ITEM_PRICE", nullable = false)
     private BigDecimal unitPrice;
 
-    @Column(name = "PRODUCT_NAME")
+    @Column(name = "PRODUCT_NAME", nullable = false)
     private String productName;
 
-    @Setter(AccessLevel.NONE) // Cannot access set for this attribute
+    @Setter(AccessLevel.NONE)
     @Column(name = "TOTAL_PRICE")
     private BigDecimal totalPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "orderId")
+    @JoinColumn(name = "ORDER_ID", nullable = false)
     private Order order;
 
     @PrePersist

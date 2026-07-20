@@ -20,21 +20,16 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Entity
-@Table(
-        name = "USER",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "USERNAME")
-        }
-)
-@Data
+@Table(name = "CUSTOMER")
+@Setter
+@Getter
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class) // an AOP to be called before OR after any changing on this entity
+@EntityListeners(AuditingEntityListener.class)
 @ValidPhoneNumber(phoneField = "phoneNumber", regionField = "region")
 public class Customer implements UserDetails
 {
-    @Id // Mark the field to be primary key
+    @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @TableGenerator
     @Column(name = "USER_ID")
     private UUID userId;
 
@@ -44,10 +39,9 @@ public class Customer implements UserDetails
     @Column(name = "USERNAME", unique = true, nullable = false)
     private String username;
 
-
     @Column(name = "PASSWORD", nullable = false)
     @Pattern(
-            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$",
+            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()\\-\\[\\]{}:;',?/*~$^+=<>]).{8,20}$",
             message = "Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character."
     )
     private String password;
@@ -66,7 +60,7 @@ public class Customer implements UserDetails
     @Column(name = "REGION", nullable = false)
     private String region;
 
-    @Column(name = "IS_LOCKED", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "IS_LOCKED", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean locked;
 
     @OneToMany(
@@ -86,7 +80,7 @@ public class Customer implements UserDetails
                     @JoinColumn(name = "USER_ID")
             },
             inverseJoinColumns = {
-                    @JoinColumn(name = "ROLES_ID")
+                    @JoinColumn(name = "ROLE_ID")
             }
     )
     private List<Role> roles;
@@ -112,8 +106,8 @@ public class Customer implements UserDetails
         if(CollectionUtils.isEmpty(this.roles))
             return List.of();
 
-        return this.roles.stream().
-                map(role -> new SimpleGrantedAuthority(role.getName()))
+        return this.roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .toList();
     }
 
@@ -138,7 +132,7 @@ public class Customer implements UserDetails
     @Override
     public boolean isEnabled()
     {
-        return UserDetails.super.isEnabled();
+        return this.enabled;
     }
 
     @Transient

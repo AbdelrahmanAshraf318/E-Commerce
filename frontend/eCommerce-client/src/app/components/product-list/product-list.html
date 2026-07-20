@@ -1,0 +1,64 @@
+<div class="product-page container py-4">
+  <h1 class="page-title mb-4">Our Products</h1>
+
+  @if (loading) {
+    <div class="state-message d-flex flex-column align-items-center justify-content-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted mb-0">Loading products...</p>
+    </div>
+  } @else if (error) {
+    <div class="alert alert-danger state-message error" role="alert">
+      Something went wrong loading products. Please try again later.
+    </div>
+  } @else {
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 product-grid">
+      @for (product of products; track product.productId) {
+        <div class="col">
+          <div class="card h-100 shadow-sm product-card">
+            <div class="product-image-wrapper">
+              <img
+                [src]="product.imageUrl || 'assets/placeholder.png'"
+                [alt]="product.productName"
+                class="card-img-top product-image"
+              />
+              <span
+                class="badge stock-badge"
+                [class.bg-success]="product.status !== 'OUT_OF_STOCK'"
+                [class.bg-danger]="product.status === 'OUT_OF_STOCK'"
+              >
+                {{ product.status === 'OUT_OF_STOCK' ? 'Out of stock' : 'In stock' }}
+              </span>
+            </div>
+
+            <div class="card-body d-flex flex-column">
+              <h3 class="card-title h5 product-name">{{ product.productName }}</h3>
+              <p class="card-text text-muted product-description">
+                {{ product.productDescription }}
+              </p>
+
+              <div class="product-footer mt-auto d-flex justify-content-between align-items-center pt-2">
+                <span class="product-price fw-bold fs-5">
+                  {{ product.price | currency: product.currency }}
+                </span>
+                <button
+                  class="btn btn-primary add-to-cart-btn"
+                  [disabled]="product.status === 'OUT_OF_STOCK'"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-12">
+          <div class="alert alert-secondary state-message text-center mb-0">
+            No products available right now.
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
