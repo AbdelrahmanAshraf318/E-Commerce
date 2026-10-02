@@ -12,8 +12,9 @@ const STORAGE_KEY = 'smartcart.theme';
  */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly media = window.matchMedia('(prefers-color-scheme: dark)');
-  private readonly systemPrefersDark = signal(this.media.matches);
+  // matchMedia is missing in some environments (jsdom in unit tests, very old embedded browsers).
+  private readonly media: MediaQueryList | null = window.matchMedia?.('(prefers-color-scheme: dark)') ?? null;
+  private readonly systemPrefersDark = signal(this.media?.matches ?? false);
 
   readonly preference = signal<ThemePreference>(readPreference());
   readonly theme = computed<Theme>(() => {
@@ -23,7 +24,7 @@ export class ThemeService {
 
   constructor() {
     // Follow OS changes live while the preference is "system".
-    this.media.addEventListener('change', (e) => this.systemPrefersDark.set(e.matches));
+    this.media?.addEventListener('change', (e) => this.systemPrefersDark.set(e.matches));
     effect(() => document.documentElement.setAttribute('data-bs-theme', this.theme()));
   }
 

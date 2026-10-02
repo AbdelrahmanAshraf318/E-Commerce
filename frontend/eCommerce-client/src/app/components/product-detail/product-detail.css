@@ -1,4 +1,8 @@
+/* The row below has a negative top margin (Bootstrap gutters) and a transform (fade-up) that lifts it into its
+   own stacking layer - without this the row sits on top of the breadcrumb and swallows its clicks. */
 .crumbs {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

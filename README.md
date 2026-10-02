@@ -331,6 +331,16 @@ cd backend/eCommerce && ./mvnw spring-boot:run      # http://localhost:8080  (Sw
 cd frontend/eCommerce-client && npm start           # http://localhost:4200
 ```
 
+### Demo video
+
+With both servers running and the dev seed loaded:
+
+```bash
+node tools/demo-video/record-demo.mjs
+```
+
+It drives a headless Chrome (throwaway profile) through every feature and writes `tools/demo-video/out/SmartCart-demo.mp4` (1920x1080, git-ignored). No npm packages or ffmpeg needed. It signs up `dana.demo@example.test`, so delete that account before re-recording.
+
 ### API overview
 
 | Method | Path | Access |
