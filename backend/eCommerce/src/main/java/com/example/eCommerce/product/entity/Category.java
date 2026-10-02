@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor // required by JPA
 @Builder
 @Table(name = "CATEGORY")
 @Entity

@@ -2,9 +2,6 @@ package com.example.eCommerce.exception;
 
 import com.example.eCommerce.common.enums.ErrorCode;
 import lombok.Getter;
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
 
 @Getter
 public class BusinessException extends RuntimeException
@@ -21,7 +18,8 @@ public class BusinessException extends RuntimeException
 
     private static String getFormatterMessage(ErrorCode errorCode, Object[] args)
     {
-        if(!CollectionUtils.isEmpty(List.of(args)))
+        // List.of(args) threw a NullPointerException as soon as one argument was null.
+        if (args != null && args.length > 0)
             return String.format(errorCode.getDefaultMessage(), args);
 
         return errorCode.getDefaultMessage();

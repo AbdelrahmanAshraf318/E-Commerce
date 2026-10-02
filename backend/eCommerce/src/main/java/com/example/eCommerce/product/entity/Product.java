@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
+// Without onlyExplicitlyIncluded, @EqualsAndHashCode.Include is ignored and lazy brand/category get hashed.
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Product
 {
     @Id
@@ -53,10 +54,6 @@ public class Product
 
     @Column(name = "WEIGHT")
     private Double weight; // in kg
-
-    @Column(name = "IMAGE_URL", length = 500)
-    private String imageUrl;
-
 
     @CreationTimestamp
     @Column(name = "CREATED_AT", updatable = false)

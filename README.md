@@ -275,3 +275,76 @@ API response < 500ms
 Zero critical admin failures
 
 Zero critical security vulnerabilities
+
+---
+
+## 🔐 Local security setup
+
+Authentication supports **email + password** and **Sign in with Google**. Both end with the backend issuing the same RS256 JWT, which the Angular app sends as `Authorization: Bearer <token>`.
+
+### 1. Generate a JWT key pair (once)
+
+```bash
+cd backend/eCommerce
+mkdir -p keys
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out keys/private_key.pem
+openssl pkey -in keys/private_key.pem -pubout -out keys/public_key.pem
+```
+
+`keys/` is git-ignored. In other environments, point `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY` at the key files (e.g. `file:/run/secrets/jwt_private.pem`).
+
+### 2. Google OAuth2 client
+
+In Google Cloud Console → APIs & Services → Credentials, create an **OAuth client ID (Web application)** with:
+
+- Authorized redirect URI: `http://localhost:8080/login/oauth2/code/google`
+
+Put the values in `backend/eCommerce/src/main/resources/application-secrets.properties` (git-ignored):
+
+```properties
+spring.security.oauth2.client.registration.google.client-id=...
+spring.security.oauth2.client.registration.google.client-secret=...
+```
+
+### 3. Database
+
+Defaults come from `application.properties` and can be overridden with `DB_URL`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`.
+One-off migrations for databases created by older builds (run with the backend stopped):
+
+- `db/001_customer_oauth2_columns.sql` - if the DB predates Google sign-in.
+- `db/002_product_image_bytea.sql` - if `product_image.image_data` is still an `oid` (pre-`bytea` builds).
+
+Sample catalogue (24 products with real photos, 5 categories, 5 brands; safe to re-run):
+
+```bash
+cd backend/eCommerce
+python db/generate_dev_seed.py        # downloads the Unsplash photos once into db/.image-cache (git-ignored)
+psql -h localhost -U postgres -d postgres -f db/dev_seed_products.sql -f db/dev_seed_product_images.sql
+```
+
+To change products or photos, edit the table in `db/generate_dev_seed.py`; photo credits are in `db/PRODUCT_IMAGE_CREDITS.md`.
+
+### 4. Run
+
+```bash
+cd backend/eCommerce && ./mvnw spring-boot:run      # http://localhost:8080  (Swagger: /swagger-ui.html)
+cd frontend/eCommerce-client && npm start           # http://localhost:4200
+```
+
+### API overview
+
+| Method | Path | Access |
+|---|---|---|
+| POST | `/api/v1/auth/register` | Public |
+| POST | `/api/v1/auth/login` | Public |
+| POST | `/api/v1/auth/reactivate` | Public (needs email + password) |
+| GET | `/oauth2/authorization/google` | Public (browser navigation, starts Google sign-in) |
+| GET | `/api/v1/products`, `/api/v1/products/{id}`, `/api/v1/products/{id}/image` | Public |
+| GET / PATCH / DELETE | `/api/v1/users/me` | Authenticated |
+| POST | `/api/v1/users/me/password` | Authenticated |
+| PATCH | `/api/v1/users/me/deactivate` | Authenticated |
+| GET / DELETE | `/api/v1/cart` | Authenticated (always the caller's own cart) |
+| POST | `/api/v1/cart/items` | Authenticated - `{ productId, quantity }`, adds to an existing line |
+| PATCH / DELETE | `/api/v1/cart/items/{productId}` | Authenticated - set quantity (1-10) / remove |
+
+Errors are RFC 9457 `ProblemDetail` JSON with a stable `code` field (e.g. `EMAIL_ALREADY_EXISTS`, `ACCOUNT_DEACTIVATED`).

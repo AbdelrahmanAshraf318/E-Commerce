@@ -18,6 +18,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Role extends BaseEntity
 {
+    public static final String CUSTOMER = "ROLE_CUSTOMER";
+    public static final String ADMIN = "ROLE_ADMIN";
+
     @Column(name = "NAME", nullable = false, unique = true)
     private String name;
 

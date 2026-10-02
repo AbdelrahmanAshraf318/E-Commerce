@@ -4,14 +4,22 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
+import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * Validates phone + region together.
+ * <p>
+ * Both empty is VALID - whether they are required is @NotBlank's job, not this validator's.
+ * Returning false for nulls (the old behaviour) broke every request where the phone is optional,
+ * e.g. a profile update that only changes the name.
+ */
 public class PhoneNumberValidator implements ConstraintValidator<ValidPhoneNumber, Object>
 {
-
     private String phoneField;
     private String regionField;
 
@@ -25,44 +33,42 @@ public class PhoneNumberValidator implements ConstraintValidator<ValidPhoneNumbe
     @Override
     public boolean isValid(Object dto, ConstraintValidatorContext context)
     {
-        if(Objects.nonNull(dto))
+        if (Objects.isNull(dto))
+            return true;
+
+        BeanWrapper wrapper = new BeanWrapperImpl(dto);
+        String phoneNumber = Objects.toString(wrapper.getPropertyValue(phoneField), null);
+        String region = Objects.toString(wrapper.getPropertyValue(regionField), null);
+
+        if (StringUtils.isAllBlank(phoneNumber, region))
+            return true;
+
+        if (StringUtils.isBlank(phoneNumber) || StringUtils.isBlank(region))
+            return violation(context, StringUtils.isBlank(phoneNumber) ? phoneField : regionField,
+                    "Phone number and region must be provided together");
+
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        String upperRegion = region.toUpperCase(Locale.ROOT);
+
+        if (!phoneUtil.getSupportedRegions().contains(upperRegion))
+            return violation(context, regionField, "Unknown region " + region);
+
+        try
         {
-            BeanWrapper wrapper = new BeanWrapperImpl(dto);
-            Object phoneValue = wrapper.getPropertyValue(phoneField);
-            Object regionValue = wrapper.getPropertyValue(regionField);
-
-            if(Objects.isNull(phoneValue) || Objects.isNull(regionValue))
-                return false;
-
-            String phoneNumber = phoneValue.toString();
-            String region = regionValue.toString();
-
-            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-
-            try
-            {
-                var parsedNumber = phoneUtil.parse(phoneNumber, region);
-                boolean valid = phoneUtil.isValidNumber(parsedNumber);
-
-                if (!valid)
-                {
-                    context.disableDefaultConstraintViolation();
-                    context.buildConstraintViolationWithTemplate(
-                            "Phone number is not valid for region " + region
-                    ).addPropertyNode(phoneField).addConstraintViolation();
-                }
-
-                return valid;
-            }
-            catch (NumberParseException e)
-            {
-                context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(
-                        "Phone number could not be parsed for region " + region
-                ).addPropertyNode(phoneField).addConstraintViolation();
-                return false;
-            }
+            if (!phoneUtil.isValidNumber(phoneUtil.parse(phoneNumber, upperRegion)))
+                return violation(context, phoneField, "Phone number is not valid for region " + upperRegion);
+            return true;
         }
+        catch (NumberParseException e)
+        {
+            return violation(context, phoneField, "Phone number could not be parsed for region " + upperRegion);
+        }
+    }
+
+    private static boolean violation(ConstraintValidatorContext context, String field, String message)
+    {
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(message).addPropertyNode(field).addConstraintViolation();
         return false;
     }
 }

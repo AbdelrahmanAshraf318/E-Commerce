@@ -1,0 +1,60 @@
+<div class="auth-shell">
+  <div class="auth-card surface fade-up">
+    <div>
+      <div class="auth-mark mb-4"><i class="bi bi-person-check"></i></div>
+      <h1 class="h3 fw-bold mb-1">Complete your profile</h1>
+      <p class="text-muted mb-4">
+        You're signed in as <strong>{{ auth.user()?.email }}</strong>. We need a few more details before you can check out.
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="mb-3">
+          <label for="name" class="form-label">Full name</label>
+          <input id="name" class="form-control" formControlName="name" autocomplete="name"
+                 [class.is-invalid]="controlError(form.controls.name)" />
+          <div class="invalid-feedback">{{ controlError(form.controls.name) }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="dateOfBirth" class="form-label">Date of birth</label>
+          <input id="dateOfBirth" type="date" class="form-control" formControlName="dateOfBirth" [max]="today" autocomplete="bday"
+                 [class.is-invalid]="controlError(form.controls.dateOfBirth)" />
+          <div class="invalid-feedback">{{ controlError(form.controls.dateOfBirth) }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="region" class="form-label">Country</label>
+          <select id="region" class="form-select" formControlName="region" autocomplete="country"
+                  [class.is-invalid]="controlError(form.controls.region)">
+            <option value="" disabled>Select a country</option>
+            @for (r of regions; track r.code) {
+              <option [value]="r.code">{{ r.name }}</option>
+            }
+          </select>
+          <div class="invalid-feedback">{{ controlError(form.controls.region) }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="phoneNumber" class="form-label">Phone number</label>
+          <input id="phoneNumber" type="tel" class="form-control" formControlName="phoneNumber" autocomplete="tel"
+                 [class.is-invalid]="controlError(form.controls.phoneNumber)" />
+          <div class="invalid-feedback">{{ controlError(form.controls.phoneNumber) }}</div>
+        </div>
+
+        @if (apiError(); as e) {
+          @if (e.code !== 'VALIDATION_FAILED' && e.code !== 'PHONE_ALREADY_EXISTS') {
+            <div class="alert alert-danger small" role="alert">{{ e.message }}</div>
+          }
+        }
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+          }
+          Save and continue
+        </button>
+        <a routerLink="/products" class="btn btn-link w-100 mt-2 text-secondary">Skip for now</a>
+      </form>
+    </div>
+  </div>
+</div>

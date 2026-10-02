@@ -1,0 +1,96 @@
+<div class="auth-shell">
+  <div class="auth-card auth-card-wide surface fade-up">
+    <div>
+      <div class="auth-mark mb-4"><i class="bi bi-person-plus"></i></div>
+      <h1 class="h3 fw-bold mb-1">Create your account</h1>
+      <p class="text-muted mb-4">Sign up with Google, or fill in the form.</p>
+
+      <app-google-button label="Sign up with Google" />
+
+      <div class="divider-text text-muted small my-3"><span>or with email</span></div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="row g-3">
+          <div class="col-12">
+            <label for="name" class="form-label">Full name</label>
+            <input id="name" class="form-control" formControlName="name" autocomplete="name"
+                   [class.is-invalid]="controlError(form.controls.name)" />
+            <div class="invalid-feedback">{{ controlError(form.controls.name) }}</div>
+          </div>
+
+          <div class="col-12">
+            <label for="email" class="form-label">Email</label>
+            <input id="email" type="email" class="form-control" formControlName="email" autocomplete="email"
+                   [class.is-invalid]="controlError(form.controls.email)" />
+            <div class="invalid-feedback">
+              {{ controlError(form.controls.email) }}
+              @if (apiError()?.code === 'EMAIL_ALREADY_EXISTS') {
+                <a routerLink="/login">Sign in instead</a>
+              }
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="password" class="form-label">Password</label>
+            <input id="password" type="password" class="form-control" formControlName="password" autocomplete="new-password"
+                   aria-describedby="passwordHelp" [class.is-invalid]="controlError(form.controls.password)" />
+            <div class="invalid-feedback">{{ controlError(form.controls.password) }}</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="confirmPassword" class="form-label">Confirm password</label>
+            <input id="confirmPassword" type="password" class="form-control" formControlName="confirmPassword" autocomplete="new-password"
+                   [class.is-invalid]="controlError(form.controls.confirmPassword)" />
+            <div class="invalid-feedback">{{ controlError(form.controls.confirmPassword) }}</div>
+          </div>
+          @if (!controlError(form.controls.password)) {
+            <div id="passwordHelp" class="form-text col-12 mt-1">{{ passwordHint }}</div>
+          }
+
+          <div class="col-md-6">
+            <label for="dateOfBirth" class="form-label">Date of birth</label>
+            <input id="dateOfBirth" type="date" class="form-control" formControlName="dateOfBirth" [max]="today" autocomplete="bday"
+                   [class.is-invalid]="controlError(form.controls.dateOfBirth)" />
+            <div class="invalid-feedback">{{ controlError(form.controls.dateOfBirth) }}</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="region" class="form-label">Country</label>
+            <select id="region" class="form-select" formControlName="region" autocomplete="country"
+                    [class.is-invalid]="controlError(form.controls.region)">
+              <option value="" disabled>Select a country</option>
+              @for (r of regions; track r.code) {
+                <option [value]="r.code">{{ r.name }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">{{ controlError(form.controls.region) }}</div>
+          </div>
+
+          <div class="col-12">
+            <label for="phoneNumber" class="form-label">Phone number</label>
+            <input id="phoneNumber" type="tel" class="form-control" formControlName="phoneNumber" autocomplete="tel"
+                   placeholder="e.g. 010 1234 5678" [class.is-invalid]="controlError(form.controls.phoneNumber)" />
+            <div class="invalid-feedback">{{ controlError(form.controls.phoneNumber) }}</div>
+          </div>
+        </div>
+
+        @if (apiError(); as e) {
+          @if (e.code !== 'VALIDATION_FAILED' && e.code !== 'EMAIL_ALREADY_EXISTS' && e.code !== 'PHONE_ALREADY_EXISTS') {
+            <div class="alert alert-danger small mt-3 mb-0" role="alert">{{ e.message }}</div>
+          }
+        }
+
+        <button type="submit" class="btn btn-primary w-100 mt-4" [disabled]="submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+          }
+          Create account
+        </button>
+      </form>
+
+      <p class="text-center text-muted small mt-4 mb-0">
+        Already have an account? <a routerLink="/login">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>

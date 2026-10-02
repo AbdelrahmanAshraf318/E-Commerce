@@ -1,0 +1,111 @@
+<div class="container py-4 py-lg-5">
+  <nav aria-label="Breadcrumb" class="crumbs mb-4">
+    <a routerLink="/products">Shop</a>
+    <i class="bi bi-chevron-right"></i>
+    @if (product(); as p) {
+      @if (p.categoryName) {
+        <span>{{ p.categoryName }}</span>
+        <i class="bi bi-chevron-right"></i>
+      }
+      <span class="current" aria-current="page">{{ p.productName }}</span>
+    } @else {
+      <span class="current">Product</span>
+    }
+  </nav>
+
+  @if (error(); as e) {
+    <div class="surface text-center py-5 px-3">
+      <span class="section-icon mx-auto mb-3" [class.danger]="e.status !== 404"><i class="bi bi-box-seam"></i></span>
+      <h1 class="h4">{{ e.status === 404 ? 'Product not found' : 'Something went wrong' }}</h1>
+      <p class="text-muted">{{ e.status === 404 ? 'It may have been removed or is no longer available.' : e.message }}</p>
+      <a routerLink="/products" class="btn btn-primary">Back to the shop</a>
+    </div>
+  } @else if (product(); as p) {
+    <div class="row g-4 g-lg-5 align-items-start fade-up">
+      <div class="col-lg-7">
+        <div class="detail-media media">
+          <img [src]="productService.imageUrl(p.productId)" [alt]="p.productName" (error)="useFallbackImage($event)" />
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="detail-panel">
+          @if (p.brandName) {
+            <span class="eyebrow">{{ p.brandName }}</span>
+          }
+          <h1 class="detail-title">{{ p.productName }}</h1>
+          <p class="detail-price">{{ p.price | currency: p.currency ?? 'USD' }}</p>
+
+          <div class="mb-4">
+            @if (!purchasable()) {
+              <span class="pill pill-danger pill-dot">Sold out</span>
+            } @else if (p.stockQuantity <= 5) {
+              <span class="pill pill-warning pill-dot">Only {{ p.stockQuantity }} left — order soon</span>
+            } @else {
+              <span class="pill pill-success pill-dot">In stock</span>
+            }
+          </div>
+
+          @if (p.productDescription) {
+            <p class="detail-description">{{ p.productDescription }}</p>
+          }
+
+          <hr class="my-4" />
+
+          @if (purchasable()) {
+            @if (maxAddable() > 0) {
+              <div class="d-flex flex-wrap align-items-center gap-3">
+                <app-quantity-stepper [value]="quantity()" [max]="maxAddable()" [disabled]="adding()"
+                                      [label]="p.productName" (valueChange)="setQuantity($event)" />
+                <button type="button" class="btn btn-primary btn-lg flex-grow-1" (click)="addToCart()" [disabled]="adding()">
+                  @if (adding()) {
+                    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Adding…
+                  } @else {
+                    <i class="bi bi-bag-plus me-2"></i>Add to cart
+                  }
+                </button>
+              </div>
+            } @else {
+              <div class="info-box">
+                <i class="bi bi-info-circle"></i>
+                You already have the maximum quantity of this product in your cart.
+              </div>
+            }
+
+            @if (inCart() > 0) {
+              <p class="small text-muted mt-3 mb-0">
+                <i class="bi bi-bag-check me-1"></i>{{ inCart() }} already in your cart · <a routerLink="/cart">View cart</a>
+              </p>
+            }
+            @if (cartError(); as message) {
+              <div class="alert alert-danger small mt-3 mb-0" role="alert">{{ message }}</div>
+            }
+          } @else {
+            <button type="button" class="btn btn-outline-secondary btn-lg w-100" disabled>Currently unavailable</button>
+          }
+
+          <ul class="detail-facts">
+            @if (p.categoryName) {
+              <li><i class="bi bi-grid"></i><span>Category</span><strong>{{ p.categoryName }}</strong></li>
+            }
+            @if (p.brandName) {
+              <li><i class="bi bi-award"></i><span>Brand</span><strong>{{ p.brandName }}</strong></li>
+            }
+            <li><i class="bi bi-box-seam"></i><span>Availability</span><strong>{{ purchasable() ? p.stockQuantity + ' in stock' : 'Sold out' }}</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="row g-4 g-lg-5 placeholder-glow" aria-busy="true">
+      <div class="col-lg-7"><div class="detail-media placeholder w-100"></div></div>
+      <div class="col-lg-5">
+        <span class="placeholder col-3 mb-3 rounded-pill"></span>
+        <span class="placeholder col-10 mb-3 rounded-pill" style="height: 2rem"></span>
+        <span class="placeholder col-4 mb-4 rounded-pill" style="height: 1.75rem"></span>
+        <span class="placeholder col-12 mb-2 rounded-pill"></span>
+        <span class="placeholder col-8 rounded-pill"></span>
+      </div>
+    </div>
+  }
+</div>

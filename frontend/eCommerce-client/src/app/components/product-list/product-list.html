@@ -1,64 +1,126 @@
-<div class="product-page container py-4">
-  <h1 class="page-title mb-4">Our Products</h1>
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner fade-up">
+      <span class="hero-kicker"><i class="bi bi-stars me-1"></i>New season picks</span>
+      <h1 class="hero-title">Everyday things,<br /><span class="hero-gradient">thoughtfully chosen.</span></h1>
+      <p class="hero-copy">Tech, books, home and outdoor essentials — curated, fairly priced, and ready to ship.</p>
 
-  @if (loading) {
-    <div class="state-message d-flex flex-column align-items-center justify-content-center py-5">
-      <div class="spinner-border text-primary mb-3" role="status">
-        <span class="visually-hidden">Loading...</span>
+      <div class="hero-search">
+        <i class="bi bi-search"></i>
+        <label for="search" class="visually-hidden">Search products</label>
+        <input id="search" type="search" placeholder="Search for headphones, books, lamps…" autocomplete="off"
+               [value]="search()" (input)="onSearch($any($event.target).value)" />
+        @if (search()) {
+          <button type="button" class="hero-search-clear" (click)="clearSearch()" aria-label="Clear search">
+            <i class="bi bi-x-circle-fill"></i>
+          </button>
+        }
       </div>
-      <p class="text-muted mb-0">Loading products...</p>
     </div>
-  } @else if (error) {
-    <div class="alert alert-danger state-message error" role="alert">
-      Something went wrong loading products. Please try again later.
+  </div>
+</section>
+
+<section class="container catalogue" id="catalogue">
+  <div class="d-flex align-items-end justify-content-between mb-4">
+    <div>
+      <h2 class="h4 fw-bold mb-1">{{ search() ? 'Results for “' + search() + '”' : 'All products' }}</h2>
+      @if (page(); as p) {
+        <p class="text-muted small mb-0">{{ p.totalElements }} {{ p.totalElements === 1 ? 'item' : 'items' }}</p>
+      }
     </div>
-  } @else {
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 product-grid">
-      @for (product of products; track product.productId) {
-        <div class="col">
-          <div class="card h-100 shadow-sm product-card">
-            <div class="product-image-wrapper">
-              <img
-                [src]="product.imageUrl || 'assets/placeholder.png'"
-                [alt]="product.productName"
-                class="card-img-top product-image"
-              />
-              <span
-                class="badge stock-badge"
-                [class.bg-success]="product.status !== 'OUT_OF_STOCK'"
-                [class.bg-danger]="product.status === 'OUT_OF_STOCK'"
-              >
-                {{ product.status === 'OUT_OF_STOCK' ? 'Out of stock' : 'In stock' }}
-              </span>
-            </div>
+    @if (loading() && page()) {
+      <div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading…</span></div>
+    }
+  </div>
 
-            <div class="card-body d-flex flex-column">
-              <h3 class="card-title h5 product-name">{{ product.productName }}</h3>
-              <p class="card-text text-muted product-description">
-                {{ product.productDescription }}
-              </p>
-
-              <div class="product-footer mt-auto d-flex justify-content-between align-items-center pt-2">
-                <span class="product-price fw-bold fs-5">
-                  {{ product.price | currency: product.currency }}
-                </span>
-                <button
-                  class="btn btn-primary add-to-cart-btn"
-                  [disabled]="product.status === 'OUT_OF_STOCK'"
-                >
-                  Add to Cart
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      } @empty {
-        <div class="col-12">
-          <div class="alert alert-secondary state-message text-center mb-0">
-            No products available right now.
+  @if (error()) {
+    <div class="surface p-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3" role="alert">
+      <div class="d-flex align-items-center gap-3">
+        <span class="section-icon danger"><i class="bi bi-wifi-off"></i></span>
+        <span>We couldn't load products. Please try again.</span>
+      </div>
+      <button type="button" class="btn btn-outline-secondary" (click)="retry()">Retry</button>
+    </div>
+  } @else if (loading() && !page()) {
+    <div class="product-grid" aria-busy="true">
+      @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+        <div class="product-card placeholder-glow">
+          <div class="product-media placeholder w-100"></div>
+          <div class="p-3">
+            <span class="placeholder col-4 mb-2 rounded-pill"></span>
+            <span class="placeholder col-9 mb-2 rounded-pill"></span>
+            <span class="placeholder col-5 rounded-pill"></span>
           </div>
         </div>
       }
     </div>
+  } @else if (page(); as p) {
+    @if (p.content.length === 0) {
+      <div class="surface text-center py-5 px-3">
+        <span class="section-icon mx-auto mb-3"><i class="bi bi-search"></i></span>
+        <h3 class="h5">No matches</h3>
+        <p class="text-muted mb-3">
+          @if (search()) { Nothing matches “{{ search() }}”. Try a different word. } @else { No products available right now. }
+        </p>
+        @if (search()) {
+          <button type="button" class="btn btn-outline-secondary" (click)="clearSearch()">Clear search</button>
+        }
+      </div>
+    } @else {
+      <div class="product-grid" [class.is-refreshing]="loading()">
+        @for (product of p.content; track product.productId; let i = $index) {
+          <article class="product-card fade-up" [style.animation-delay.ms]="i * 30">
+            <div class="product-media media">
+              <img [src]="productService.imageUrl(product.productId)" [alt]="product.productName" loading="lazy"
+                   (error)="useFallbackImage($event)" />
+              @if (!isPurchasable(product)) {
+                <span class="pill pill-danger media-pill">Sold out</span>
+              } @else if (product.stockQuantity <= 5) {
+                <span class="pill pill-warning media-pill">Only {{ product.stockQuantity }} left</span>
+              }
+              @if (isPurchasable(product)) {
+                <button type="button" class="quick-add" (click)="quickAdd(product)" [disabled]="addingId() === product.productId"
+                        [attr.aria-label]="'Add ' + product.productName + ' to cart'">
+                  @if (addingId() === product.productId) {
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  } @else {
+                    <i class="bi bi-bag-plus"></i>
+                  }
+                </button>
+              }
+            </div>
+
+            <div class="product-body">
+              <div class="d-flex justify-content-between gap-2 small mb-1">
+                <span class="text-muted">{{ product.categoryName }}</span>
+                <span class="text-muted">{{ product.brandName }}</span>
+              </div>
+              <h3 class="product-title">
+                <a [routerLink]="['/products', product.productId]" class="stretched-link">{{ product.productName }}</a>
+              </h3>
+              <p class="product-price">{{ product.price | currency: product.currency ?? 'USD' }}</p>
+            </div>
+          </article>
+        }
+      </div>
+
+      @if (p.totalPages > 1) {
+        <nav class="d-flex justify-content-center mt-5" aria-label="Product pages">
+          <ul class="pagination mb-0 align-items-center">
+            <li class="page-item" [class.disabled]="p.page === 0">
+              <button type="button" class="page-link" (click)="goToPage(p.page - 1)" [disabled]="p.page === 0">
+                <i class="bi bi-arrow-left me-1"></i>Previous
+              </button>
+            </li>
+            <li class="px-2 small text-muted">Page {{ p.page + 1 }} of {{ p.totalPages }}</li>
+            <li class="page-item" [class.disabled]="p.page + 1 >= p.totalPages">
+              <button type="button" class="page-link" (click)="goToPage(p.page + 1)" [disabled]="p.page + 1 >= p.totalPages">
+                Next<i class="bi bi-arrow-right ms-1"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      }
+    }
   }
-</div>
+</section>

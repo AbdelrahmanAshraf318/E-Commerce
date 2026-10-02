@@ -14,8 +14,7 @@ public record ProductResponseRecord(Integer productId,
                                     Integer stockQuantity,
                                     ProductStatus status,
                                     String categoryName,
-                                    String brandName,
-                                    String imageUrl)
+                                    String brandName)
 {
     public static ProductResponseRecord fromEntity(Product product)
     {
@@ -28,8 +27,7 @@ public record ProductResponseRecord(Integer productId,
                 product.getStockQuantity(),
                 product.getStatus(),
                 Objects.nonNull(product.getCategory()) ? product.getCategory().getCategoryName() : null,
-                Objects.nonNull(product.getBrand()) ? product.getBrand().getBrandName() : null,
-                product.getImageUrl()
+                Objects.nonNull(product.getBrand()) ? product.getBrand().getBrandName() : null
         );
     }
 }

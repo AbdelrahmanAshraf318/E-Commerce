@@ -1,5 +1,6 @@
 package com.example.eCommerce.user.dtos;
 
+import com.example.eCommerce.user.validation.PasswordPolicy;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -11,16 +12,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChangePasswordRequest
 {
-    @NotBlank
+    // Required when the account already has a password. Google-only accounts can set a first password without it.
     private String currentPassword;
 
-    @NotBlank
-    @Pattern(
-            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$",
-            message = "Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character."
-    )
+    @NotBlank(message = "New password is required")
+    @Pattern(regexp = PasswordPolicy.REGEX, message = PasswordPolicy.MESSAGE)
     private String newPassword;
 
-    @NotBlank
+    @NotBlank(message = "Password confirmation is required")
     private String confirmedNewPassword;
+
+    @Override
+    public String toString()
+    {
+        return "ChangePasswordRequest(***)";
+    }
 }

@@ -1,0 +1,25 @@
+.account-avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1, #4f46e5 55%, #7c3aed);
+  box-shadow: 0 10px 24px -10px rgba(79, 70, 229, 0.7);
+}
+
+.danger-surface {
+  border-color: rgba(220, 38, 38, 0.18);
+}
+
+dt {
+  font-size: 0.875rem;
+}
+
+dd {
+  color: var(--sc-ink);
+  font-weight: 600;
+}

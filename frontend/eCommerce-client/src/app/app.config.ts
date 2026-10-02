@@ -1,15 +1,22 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
-import { ProductService } from './services/product/product-service';
+import { authInterceptor } from './core/auth/auth.interceptor';
+import { AuthService } from './core/auth/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
-    provideHttpClient(),
-    ProductService
-  ]
+    provideRouter(routes, withComponentInputBinding()),
+    provideHttpClient(withInterceptors([authInterceptor])),
+    // Load the signed-in user before the first route renders, so guards and the navbar see the right state.
+    provideAppInitializer(() => inject(AuthService).restoreSession()),
+  ],
 };

@@ -33,3 +33,12 @@ build/
 .vscode/
 
 .env
+
+
+### Secrets (paths are relative to this .gitignore) ###
+src/main/resources/application-secrets.properties
+keys/
+
+### Generated dev seed ###
+db/.image-cache/
+db/dev_seed_product_images.sql

@@ -1,0 +1,235 @@
+<div class="container py-4 account-page">
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <span class="account-avatar">{{ initials() }}</span>
+    <div>
+      <h1 class="page-heading h2 mb-0">My account</h1>
+      <p class="text-muted mb-0">{{ user()?.email }}</p>
+    </div>
+  </div>
+
+  @if (user(); as u) {
+    <!-- ================= Profile ================= -->
+    <section class="surface mb-4 fade-up" aria-labelledby="profileHeading">
+      <div class="p-4 p-md-5">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <div class="d-flex align-items-center gap-3 mb-2"><span class="section-icon"><i class="bi bi-person"></i></span><h2 id="profileHeading" class="h5 fw-bold mb-0">Profile</h2></div>
+            <span class="pill pill-neutral">
+              @if (u.authProvider === 'GOOGLE') {
+                <i class="bi bi-google me-1"></i>Signed up with Google
+              } @else {
+                <i class="bi bi-envelope me-1"></i>Email account
+              }
+            </span>
+          </div>
+          @if (!editing()) {
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="startEditing()">
+              <i class="bi bi-pencil me-1"></i>Edit
+            </button>
+          }
+        </div>
+
+        @if (profileSaved()) {
+          <div class="alert alert-success small py-2" role="status">Profile updated.</div>
+        }
+
+        @if (!editing()) {
+          <dl class="row mb-0">
+            <dt class="col-sm-4 text-muted fw-normal">Name</dt>
+            <dd class="col-sm-8">{{ u.name }}</dd>
+            <dt class="col-sm-4 text-muted fw-normal">Email</dt>
+            <dd class="col-sm-8">{{ u.email }}</dd>
+            <dt class="col-sm-4 text-muted fw-normal">Date of birth</dt>
+            <dd class="col-sm-8">
+              @if (u.dateOfBirth) {
+                {{ u.dateOfBirth | date: 'longDate' }} <span class="text-muted">({{ u.age }})</span>
+              } @else {
+                <span class="text-muted fst-italic">Not set</span>
+              }
+            </dd>
+            <dt class="col-sm-4 text-muted fw-normal">Country</dt>
+            <dd class="col-sm-8">{{ regionName() || '—' }}</dd>
+            <dt class="col-sm-4 text-muted fw-normal">Phone</dt>
+            <dd class="col-sm-8 mb-0">{{ u.phoneNumber || '—' }}</dd>
+          </dl>
+        } @else {
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="name" class="form-label">Full name</label>
+                <input id="name" class="form-control" formControlName="name"
+                       [class.is-invalid]="controlError(profileForm.controls.name)" />
+                <div class="invalid-feedback">{{ controlError(profileForm.controls.name) }}</div>
+              </div>
+              <div class="col-12">
+                <label for="email" class="form-label">Email</label>
+                <input id="email" class="form-control" [value]="u.email" disabled />
+                <div class="form-text">Email is your sign-in identifier and can't be changed here.</div>
+              </div>
+              <div class="col-md-4">
+                <label for="dateOfBirth" class="form-label">Date of birth</label>
+                <input id="dateOfBirth" type="date" class="form-control" formControlName="dateOfBirth" [max]="today"
+                       [class.is-invalid]="controlError(profileForm.controls.dateOfBirth)" />
+                <div class="invalid-feedback">{{ controlError(profileForm.controls.dateOfBirth) }}</div>
+              </div>
+              <div class="col-md-4">
+                <label for="region" class="form-label">Country</label>
+                <select id="region" class="form-select" formControlName="region"
+                        [class.is-invalid]="controlError(profileForm.controls.region)">
+                  <option value="">—</option>
+                  @for (r of regions; track r.code) {
+                    <option [value]="r.code">{{ r.name }}</option>
+                  }
+                </select>
+                <div class="invalid-feedback">{{ controlError(profileForm.controls.region) }}</div>
+              </div>
+              <div class="col-md-4">
+                <label for="phoneNumber" class="form-label">Phone</label>
+                <input id="phoneNumber" type="tel" class="form-control" formControlName="phoneNumber"
+                       [class.is-invalid]="controlError(profileForm.controls.phoneNumber)" />
+                <div class="invalid-feedback">{{ controlError(profileForm.controls.phoneNumber) }}</div>
+              </div>
+            </div>
+
+            @if (profileError(); as e) {
+              @if (e.code !== 'VALIDATION_FAILED' && e.code !== 'PHONE_ALREADY_EXISTS') {
+                <div class="alert alert-danger small mt-3 mb-0" role="alert">{{ e.message }}</div>
+              }
+            }
+
+            <div class="d-flex gap-2 mt-3">
+              <button type="submit" class="btn btn-primary" [disabled]="profileSaving()">
+                @if (profileSaving()) {
+                  <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                }
+                Save changes
+              </button>
+              <button type="button" class="btn btn-outline-secondary" (click)="editing.set(false)" [disabled]="profileSaving()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </section>
+
+    <!-- ================= Password ================= -->
+    <section class="surface mb-4 fade-up" aria-labelledby="passwordHeading">
+      <div class="p-4 p-md-5">
+        <div class="d-flex align-items-center gap-3 mb-2"><span class="section-icon"><i class="bi bi-key"></i></span><h2 id="passwordHeading" class="h5 fw-bold mb-0">{{ u.hasPassword ? 'Change password' : 'Set a password' }}</h2></div>
+        <p class="text-muted small mb-3">
+          @if (u.hasPassword) {
+            You'll need your current password.
+          } @else {
+            You signed up with Google. Setting a password also lets you sign in with your email.
+          }
+        </p>
+
+        @if (passwordSaved()) {
+          <div class="alert alert-success small py-2" role="status">Password saved.</div>
+        }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="savePassword()" novalidate>
+          <div class="row g-3">
+            @if (u.hasPassword) {
+              <div class="col-md-4">
+                <label for="currentPassword" class="form-label">Current password</label>
+                <input id="currentPassword" type="password" class="form-control" formControlName="currentPassword"
+                       autocomplete="current-password" [class.is-invalid]="controlError(passwordForm.controls.currentPassword)" />
+                <div class="invalid-feedback">{{ controlError(passwordForm.controls.currentPassword) }}</div>
+              </div>
+            }
+            <div [class.col-md-4]="u.hasPassword" [class.col-md-6]="!u.hasPassword">
+              <label for="newPassword" class="form-label">New password</label>
+              <input id="newPassword" type="password" class="form-control" formControlName="newPassword"
+                     autocomplete="new-password" [class.is-invalid]="controlError(passwordForm.controls.newPassword)" />
+              <div class="invalid-feedback">{{ controlError(passwordForm.controls.newPassword) }}</div>
+            </div>
+            <div [class.col-md-4]="u.hasPassword" [class.col-md-6]="!u.hasPassword">
+              <label for="confirmedNewPassword" class="form-label">Confirm new password</label>
+              <input id="confirmedNewPassword" type="password" class="form-control" formControlName="confirmedNewPassword"
+                     autocomplete="new-password" [class.is-invalid]="controlError(passwordForm.controls.confirmedNewPassword)" />
+              <div class="invalid-feedback">{{ controlError(passwordForm.controls.confirmedNewPassword) }}</div>
+            </div>
+          </div>
+          <div class="form-text">{{ passwordHint }}</div>
+
+          @if (passwordError(); as e) {
+            @if (!['VALIDATION_FAILED', 'CURRENT_PASSWORD_INCORRECT', 'CURRENT_PASSWORD_REQUIRED'].includes(e.code)) {
+              <div class="alert alert-danger small mt-3 mb-0" role="alert">{{ e.message }}</div>
+            }
+          }
+
+          <button type="submit" class="btn btn-primary mt-3" [disabled]="passwordSaving()">
+            @if (passwordSaving()) {
+              <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+            }
+            {{ u.hasPassword ? 'Update password' : 'Set password' }}
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= Danger zone ================= -->
+    <section class="surface danger-surface fade-up" aria-labelledby="dangerHeading">
+      <div class="p-4 p-md-5">
+        <div class="d-flex align-items-center gap-3 mb-4"><span class="section-icon danger"><i class="bi bi-exclamation-octagon"></i></span><h2 id="dangerHeading" class="h5 fw-bold mb-0">Danger zone</h2></div>
+
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 pb-3 border-bottom">
+          <div>
+            <h3 class="h6 mb-1">Deactivate account</h3>
+            <p class="text-muted small mb-0">
+              Signs you out and hides your account. Come back any time by signing in
+              {{ u.authProvider === 'GOOGLE' ? 'with Google' : 'and choosing “Reactivate”' }}.
+            </p>
+          </div>
+          <button type="button" class="btn btn-outline-danger align-self-md-center text-nowrap" (click)="confirm('deactivate')">
+            Deactivate
+          </button>
+        </div>
+
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 pt-3">
+          <div>
+            <h3 class="h6 mb-1">Delete account</h3>
+            <p class="text-muted small mb-0">Permanently deletes your account and order history. This can't be undone.</p>
+          </div>
+          <button type="button" class="btn btn-danger align-self-md-center text-nowrap" (click)="confirm('delete')">
+            Delete account
+          </button>
+        </div>
+
+        @if (confirming(); as action) {
+          <div class="alert alert-danger mt-4 mb-0" role="alertdialog" aria-labelledby="confirmTitle">
+            <h3 id="confirmTitle" class="h6">
+              {{ action === 'delete' ? 'Delete your account permanently?' : 'Deactivate your account?' }}
+            </h3>
+            @if (action === 'delete') {
+              <label for="deleteConfirm" class="form-label small">Type <strong>DELETE</strong> to confirm.</label>
+              <input id="deleteConfirm" class="form-control form-control-sm mb-3 confirm-input" autocomplete="off"
+                     [value]="deleteConfirmation()" (input)="deleteConfirmation.set($any($event.target).value)" />
+            }
+            @if (dangerError(); as e) {
+              <p class="small mb-2">{{ e.message }}</p>
+            }
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-danger btn-sm" (click)="runDangerAction()"
+                      [disabled]="dangerBusy() || (action === 'delete' && deleteConfirmation() !== 'DELETE')">
+                @if (dangerBusy()) {
+                  <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                }
+                {{ action === 'delete' ? 'Delete forever' : 'Yes, deactivate' }}
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="confirm(null)" [disabled]="dangerBusy()">
+                Cancel
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  } @else {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading…</span></div>
+    </div>
+  }
+</div>

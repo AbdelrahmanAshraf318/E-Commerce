@@ -1,16 +1,16 @@
 package com.example.eCommerce.user.dtos;
 
 import com.example.eCommerce.common.validatePhone.ValidPhoneNumber;
-import com.example.eCommerce.user.role.Role;
+import com.example.eCommerce.user.validation.PasswordPolicy;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.validator.constraints.UniqueElements;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -19,28 +19,34 @@ import java.util.List;
 @ValidPhoneNumber(phoneField = "phoneNumber", regionField = "region")
 public class CreateUserRequest
 {
-    @NotBlank
+    @NotBlank(message = "Name is required")
+    @Size(max = 100, message = "Name must be at most 100 characters")
     private String name;
 
-    @NotBlank
-    private String username;
-
-    @NotBlank
-    @Pattern(
-            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$",
-            message = "Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character."
-    )
+    @NotBlank(message = "Password is required")
+    @Pattern(regexp = PasswordPolicy.REGEX, message = PasswordPolicy.MESSAGE)
     private String password;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
 
-    @DateTimeFormat
-    private Date dateOfBirth;
+    @NotNull(message = "Date of birth is required")
+    @Past(message = "Date of birth must be in the past")
+    private LocalDate dateOfBirth;
+
+    // Required for local sign-up. Google users fill these in later through PATCH /api/v1/users/me.
+    @NotBlank(message = "Phone number is required")
     private String phoneNumber;
+
+    @NotBlank(message = "Region is required")
+    @Size(min = 2, max = 2, message = "Region must be a 2-letter ISO country code, e.g. EG")
     private String region;
 
-    @UniqueElements
-    private List<Role> roles;
+    // Never let Lombok print the password into logs.
+    @Override
+    public String toString()
+    {
+        return "CreateUserRequest(name=" + name + ", email=" + email + ")";
+    }
 }

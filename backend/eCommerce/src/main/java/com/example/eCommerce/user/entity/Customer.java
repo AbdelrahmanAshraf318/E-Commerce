@@ -1,14 +1,11 @@
 package com.example.eCommerce.user.entity;
 
-import com.example.eCommerce.common.validatePhone.ValidPhoneNumber;
 import com.example.eCommerce.order.entity.Order;
+import com.example.eCommerce.user.enums.AuthProvider;
 import com.example.eCommerce.user.role.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,8 +13,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "CUSTOMER")
@@ -25,7 +24,6 @@ import java.util.*;
 @Getter
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@ValidPhoneNumber(phoneField = "phoneNumber", regionField = "region")
 public class Customer implements UserDetails
 {
     @Id
@@ -36,57 +34,60 @@ public class Customer implements UserDetails
     @Column(name = "NAME", nullable = false)
     private String name;
 
-    @Column(name = "USERNAME", unique = true, nullable = false)
-    private String username;
-
-    @Column(name = "PASSWORD", nullable = false)
-    @Pattern(
-            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()\\-\\[\\]{}:;',?/*~$^+=<>]).{8,20}$",
-            message = "Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character."
-    )
-    private String password;
-
-    @Email
+    // Email is the most reliable unique identifier across OAuth providers.
     @Column(name = "EMAIL", nullable = false, unique = true)
     private String email;
 
-    @DateTimeFormat
-    @Column(name = "DATE_OF_BIRTH", nullable = false)
-    private Date dateOfBirth;
+    // Made nullable. OAuth users will not have a password.
+    @Column(name = "PASSWORD")
+    private String password;
 
-    @Column(name = "PHONE_NUMBER", nullable = false, unique = true)
+    // Tracks where this user originated (LOCAL, GOOGLE, APPLE)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "AUTH_PROVIDER", nullable = false)
+    private AuthProvider authProvider;
+
+    // Made nullable. You can prompt the user to fill these in later
+    // via a "Complete Your Profile" step.
+    @Column(name = "DATE_OF_BIRTH")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "PHONE_NUMBER", unique = true)
     private String phoneNumber;
 
-    @Column(name = "REGION", nullable = false)
+    @Column(name = "REGION")
     private String region;
 
-    @Column(name = "IS_LOCKED", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private boolean locked;
+    @Column(name = "IS_LOCKED", nullable = false)
+    private boolean locked = false;
 
-    @OneToMany(
-            mappedBy = "customer",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<Order> orders;
+    @Column(name = "IS_ENABLED", nullable = false)
+    private boolean enabled = true;
 
-    @ManyToMany(
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            fetch = FetchType.EAGER
-    )
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
+
+    // LAZY + @EntityGraph in CustomerRepo when roles are needed.
+    // No cascade: roles are reference data and must never be created/changed through a customer.
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "USERS_ROLES",
-            joinColumns = {
-                    @JoinColumn(name = "USER_ID")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "ROLE_ID")
-            }
+            joinColumns = @JoinColumn(name = "USER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
     )
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 
-    @Column(name = "IS_ENABLED", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private boolean enabled;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities()
+    {
+        if (CollectionUtils.isEmpty(this.roles))
+        {
+            return List.of();
+        }
+        return this.roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .toList();
+    }
 
     @Override
     public String getPassword()
@@ -94,21 +95,12 @@ public class Customer implements UserDetails
         return this.password;
     }
 
+    // Spring Security uses this to identify the user.
+    // Email is better suited for this than a separate username field in modern apps.
     @Override
     public String getUsername()
     {
-        return this.username;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities()
-    {
-        if(CollectionUtils.isEmpty(this.roles))
-            return List.of();
-
-        return this.roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .toList();
+        return this.email;
     }
 
     @Override
@@ -126,7 +118,7 @@ public class Customer implements UserDetails
     @Override
     public boolean isCredentialsNonExpired()
     {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override
@@ -135,18 +127,19 @@ public class Customer implements UserDetails
         return this.enabled;
     }
 
+    /** Google users start without these; the SPA sends them to "complete profile" until this is true. */
+    @Transient
+    public boolean isProfileComplete()
+    {
+        return dateOfBirth != null && phoneNumber != null && region != null;
+    }
+
     @Transient
     public Integer getAge()
     {
-        if(Objects.nonNull(this.dateOfBirth))
-        {
-            LocalDate birthDate = this.dateOfBirth.toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-
-            return Period.between(birthDate, LocalDate.now()).getYears();
+        if (this.dateOfBirth != null) {
+            return Period.between(this.dateOfBirth, LocalDate.now()).getYears();
         }
-
         return null;
     }
 }

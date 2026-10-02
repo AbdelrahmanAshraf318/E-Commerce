@@ -1,0 +1,57 @@
+<div class="auth-shell">
+  <div class="auth-card surface fade-up">
+    <div>
+      <div class="auth-mark mb-4"><i class="bi bi-box-arrow-in-right"></i></div>
+      <h1 class="h3 fw-bold mb-1">Sign in</h1>
+      <p class="text-muted mb-4">Welcome back to SmartCart.</p>
+
+      @if (notice(); as n) {
+        <div class="alert alert-{{ n.type }} small" role="status">{{ n.text }}</div>
+      }
+
+      <app-google-button />
+
+      <div class="divider-text text-muted small my-3"><span>or with email</span></div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input id="email" type="email" class="form-control" formControlName="email" autocomplete="email"
+                 [class.is-invalid]="controlError(form.controls.email)" />
+          <div class="invalid-feedback">{{ controlError(form.controls.email) }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input id="password" type="password" class="form-control" formControlName="password" autocomplete="current-password"
+                 [class.is-invalid]="controlError(form.controls.password)" />
+          <div class="invalid-feedback">{{ controlError(form.controls.password) }}</div>
+        </div>
+
+        @if (apiError(); as e) {
+          @if (e.code === 'ACCOUNT_DEACTIVATED') {
+            <div class="alert alert-warning small" role="alert">
+              <p class="mb-2">This account is deactivated. Reactivate it to continue - your data is still here.</p>
+              <button type="button" class="btn btn-sm btn-warning" (click)="reactivate()" [disabled]="submitting()">
+                Reactivate my account
+              </button>
+            </div>
+          } @else if (e.code !== 'VALIDATION_FAILED') {
+            <div class="alert alert-danger small" role="alert">{{ e.message }}</div>
+          }
+        }
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+          }
+          Sign in
+        </button>
+      </form>
+
+      <p class="text-center text-muted small mt-4 mb-0">
+        New to SmartCart? <a routerLink="/register">Create an account</a>
+      </p>
+    </div>
+  </div>
+</div>

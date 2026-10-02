@@ -1,0 +1,138 @@
+<div class="container py-4 py-lg-5">
+  <div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-4">
+    <div>
+      <h1 class="page-heading h2 mb-1">Your cart</h1>
+      @if (cart(); as c) {
+        @if (c.items.length > 0) {
+          <p class="text-muted mb-0">{{ c.items.length }} {{ c.items.length === 1 ? 'product' : 'products' }}</p>
+        }
+      }
+    </div>
+    <a routerLink="/products" class="btn btn-link text-decoration-none fw-semibold px-0"><i class="bi bi-arrow-left me-1"></i>Continue shopping</a>
+  </div>
+
+  @if (loadError(); as message) {
+    <div class="alert alert-danger" role="alert">{{ message }}</div>
+  }
+
+  @if (cart(); as c) {
+    @if (c.items.length === 0) {
+      <div class="surface text-center py-5 px-3 fade-up">
+        <div class="empty-illustration mx-auto mb-4"><i class="bi bi-bag"></i></div>
+        <h2 class="h4 fw-bold">Your cart is empty</h2>
+        <p class="text-muted mb-4">Looks like you haven't added anything yet.</p>
+        <a routerLink="/products" class="btn btn-primary btn-lg">Start shopping</a>
+      </div>
+    } @else {
+      <div class="row g-4">
+        <!-- ================= Lines ================= -->
+        <div class="col-lg-8">
+          @if (c.hasUnavailableItems) {
+            <div class="alert alert-warning d-flex gap-2" role="status">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>Some items changed since you added them. They aren't counted in your total until you fix them.</span>
+            </div>
+          }
+
+          <ul class="list-unstyled surface mb-3 overflow-hidden">
+            @for (item of c.items; track item.productId) {
+              <li class="cart-line" [class.is-busy]="busyProductId() === item.productId" [class.is-unavailable]="!item.available">
+                <a [routerLink]="['/products', item.productId]" class="cart-thumb media flex-shrink-0">
+                  <img [src]="productService.imageUrl(item.productId)" [alt]="item.productName" (error)="useFallbackImage($event)" />
+                </a>
+
+                <div class="flex-grow-1 min-w-0">
+                  <div class="d-flex justify-content-between gap-3">
+                    <div class="min-w-0">
+                      <a [routerLink]="['/products', item.productId]" class="cart-name">{{ item.productName }}</a>
+                      <div class="text-muted small">{{ item.unitPrice | currency: item.currency ?? 'USD' }} each</div>
+                    </div>
+                    <div class="cart-line-total" [class.is-struck]="!item.available">
+                      {{ item.lineTotal | currency: item.currency ?? 'USD' }}
+                    </div>
+                  </div>
+
+                  @if (!item.available) {
+                    <p class="pill pill-danger mt-2 mb-0">
+                      <i class="bi bi-exclamation-circle"></i>{{ unavailableReason(item) }}
+                    </p>
+                  }
+
+                  <div class="d-flex align-items-center gap-2 mt-3">
+                    @if (item.maxQuantity > 0) {
+                      <app-quantity-stepper size="sm" [value]="item.quantity" [max]="item.maxQuantity" [label]="item.productName"
+                                            [disabled]="busyProductId() === item.productId"
+                                            (valueChange)="changeQuantity(item, $event)" />
+                    }
+                    <button type="button" class="btn btn-sm btn-link text-muted text-decoration-none remove-btn"
+                            [disabled]="busyProductId() === item.productId" (click)="remove(item)">
+                      <i class="bi bi-trash3 me-1"></i>Remove
+                    </button>
+                    @if (busyProductId() === item.productId) {
+                      <span class="spinner-border spinner-border-sm text-primary ms-auto" role="status">
+                        <span class="visually-hidden">Updating…</span>
+                      </span>
+                    }
+                  </div>
+
+                  @if (lineErrors()[item.productId]; as message) {
+                    <p class="small text-danger mt-2 mb-0" role="alert">{{ message }}</p>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+
+          @if (!confirmClear()) {
+            <button type="button" class="btn btn-sm btn-link text-muted text-decoration-none px-0" (click)="confirmClear.set(true)">
+              <i class="bi bi-x-circle me-1"></i>Empty cart
+            </button>
+          } @else {
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <span class="small fw-semibold">Remove all items?</span>
+              <button type="button" class="btn btn-sm btn-danger" (click)="clear()" [disabled]="clearing()">Yes, empty it</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="confirmClear.set(false)" [disabled]="clearing()">Cancel</button>
+            </div>
+          }
+        </div>
+
+        <!-- ================= Summary ================= -->
+        <div class="col-lg-4">
+          <aside class="surface summary-card p-4">
+            <h2 class="h5 fw-bold mb-4">Order summary</h2>
+            <div class="summary-row">
+              <span>Items</span>
+              <span>{{ c.totalQuantity }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span>{{ c.subtotal | currency: currency() }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span class="text-muted">At checkout</span>
+            </div>
+            <div class="summary-total">
+              <span>Total</span>
+              <span>{{ c.subtotal | currency: currency() }}</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-lg w-100" disabled title="Checkout is the next module">
+              <i class="bi bi-lock me-2"></i>Checkout
+            </button>
+            <p class="text-muted small text-center mt-3 mb-0">
+              @if (c.hasUnavailableItems) {
+                Fix the highlighted items first.
+              } @else {
+                Checkout is coming soon.
+              }
+            </p>
+          </aside>
+        </div>
+      </div>
+    }
+  } @else if (!loadError()) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading…</span></div>
+    </div>
+  }
+</div>
