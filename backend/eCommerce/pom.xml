@@ -30,6 +30,7 @@
 		<java.version>21</java.version>
 		<jjwt.version>0.12.6</jjwt.version>
 		<springdoc.version>3.1.1</springdoc.version>
+		<lombok.version>1.18.44</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -54,7 +55,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.libphonenumber</groupId>

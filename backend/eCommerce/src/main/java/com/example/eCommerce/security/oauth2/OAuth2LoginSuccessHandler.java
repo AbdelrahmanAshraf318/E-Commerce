@@ -27,6 +27,11 @@ import java.util.Locale;
  * <p>
  * The token goes in the URL <b>fragment</b> (#token=...): browsers never send fragments to servers,
  * so it does not end up in access logs or Referer headers.
+ * <p>
+ * By the time this runs, Spring Security's {@code OAuth2LoginAuthenticationFilter} has already done the hard part
+ * of the Authorization Code flow: checked the {@code state} parameter (CSRF protection for the login itself),
+ * exchanged the one-time {@code code} for tokens directly with Google (server to server, using the client secret),
+ * validated Google's ID token (OpenID Connect) and loaded the user's profile.
  */
 @Slf4j
 @Component
@@ -37,6 +42,24 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler
     private final SecurityProperties securityProperties;
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
+    /**
+     * Converts a successful Google login into a SmartCart session.
+     * <ol>
+     *   <li>Read the provider ("google" -> {@link AuthProvider#GOOGLE}) and the user's verified profile:
+     *       {@code email}, {@code name} and {@code email_verified}.</li>
+     *   <li>{@link AuthService#loginWithOAuth2} finds the customer by email or creates one, refuses unverified
+     *       emails (account-takeover protection) and locked accounts, reactivates deactivated ones, and returns our JWT.</li>
+     *   <li>Redirect to the SPA: {@code /oauth2/callback#token=...} on success,
+     *       {@code /oauth2/callback?error=CODE} on failure. The error code is safe to put in a query string; the token is not.</li>
+     *   <li>Always clean up: clear the SecurityContext and invalidate the short-lived HTTP session that carried the
+     *       OAuth2 {@code state} across the Google redirect - after this, the API is stateless again.</li>
+     * </ol>
+     * Google's own access token is not kept: we only needed it to learn who the user is.
+     *
+     * @param request        the callback request from Google (/login/oauth2/code/google)
+     * @param response       used to send the redirect
+     * @param authentication an {@link OAuth2AuthenticationToken} holding Google's view of the user
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException

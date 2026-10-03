@@ -71,6 +71,30 @@ public class SecurityConfig
             "/swagger-ui.html"
     };
 
+    /**
+     * The rules every HTTP request goes through. Spring Security turns this into an ordered chain of servlet
+     * filters (CORS, OAuth2 login, our JwtFilter, exception translation, authorization, ...) that runs before
+     * any controller.
+     * <ul>
+     *   <li><b>CSRF off</b> - CSRF attacks ride on cookies the browser sends automatically. This API is authenticated
+     *       only by an {@code Authorization} header that JavaScript must add explicitly, so a forged cross-site request
+     *       arrives anonymous. (If tokens ever move into cookies, CSRF protection must come back on.)</li>
+     *   <li><b>CORS on</b> - lets the browser call the API from the SPA's origin; see {@link #corsConfigurationSource}.</li>
+     *   <li><b>formLogin / httpBasic / logout off</b> - those are for server-rendered apps; they would add HTML login
+     *       pages and Basic-auth prompts we do not want. Logout in a stateless API = the client discards the token.</li>
+     *   <li><b>STATELESS</b> - no HTTP session stores who you are; every request proves it again with its token.</li>
+     *   <li><b>authorizeHttpRequests</b> - first matching rule wins: sign-up/login and the catalogue are public,
+     *       everything else needs an authenticated user. Matching includes the HTTP method, so e.g. only GET on
+     *       products is public.</li>
+     *   <li><b>oauth2Login</b> - adds the "/oauth2/authorization/google" and "/login/oauth2/code/google" endpoints
+     *       and plugs in our success/failure handlers.</li>
+     *   <li><b>exceptionHandling</b> - turns "not logged in" into a JSON 401 and "not allowed" into a JSON 403.</li>
+     *   <li><b>JwtFilter</b> - placed before {@link UsernamePasswordAuthenticationFilter}, so the request is already
+     *       identified by the time authorization rules are evaluated.</li>
+     * </ul>
+     *
+     * @return the configured filter chain
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtService jwtService,
@@ -109,6 +133,21 @@ public class SecurityConfig
                 .build();
     }
 
+    /**
+     * Checks email + password logins (used by AuthServiceImpl.login).
+     * <p>
+     * {@link ProviderManager} delegates to its providers; we have one, {@link DaoAuthenticationProvider}, which
+     * loads the user through {@link CustomerUserDetailsService} and verifies the password with the BCrypt
+     * {@link PasswordEncoder}. BCrypt is deliberately slow and salts every hash, so stolen hashes are expensive
+     * to crack and two equal passwords never produce the same hash.
+     * <p>
+     * Unknown emails and wrong passwords both surface as {@code BadCredentialsException} (user-not-found is hidden
+     * by default), so the login response never reveals whether an email is registered.
+     *
+     * @param userDetailsService looks customers up by email
+     * @param passwordEncoder    the BCrypt encoder from BeansConfig
+     * @return the manager used for password authentication
+     */
     @Bean
     public AuthenticationManager authenticationManager(CustomerUserDetailsService userDetailsService,
                                                        PasswordEncoder passwordEncoder)
@@ -118,6 +157,25 @@ public class SecurityConfig
         return new ProviderManager(provider);
     }
 
+    /**
+     * CORS: which <b>other websites</b> a browser may let call this API.
+     * <p>
+     * Browsers block JavaScript on http://localhost:4200 from reading responses from http://localhost:8080
+     * (a different origin) unless the server opts in. Before "non-simple" requests (JSON bodies, an Authorization
+     * header) the browser sends a preflight {@code OPTIONS} request; Spring answers it from this configuration.
+     * <ul>
+     *   <li>Origins - only the configured SPA origin(s); never "*" for an authenticated API.</li>
+     *   <li>Headers - Authorization (the token) and Content-Type (JSON).</li>
+     *   <li>Credentials - off: we send tokens in a header, not cookies.</li>
+     *   <li>Max age - the browser may cache the preflight answer for an hour, saving a round trip per request.</li>
+     * </ul>
+     * Only "/api/**" gets CORS: the OAuth2 endpoints are full-page navigations, not JavaScript calls.
+     * Note CORS is a <b>browser</b> protection - it does not stop curl or a server from calling the API;
+     * authentication does that.
+     *
+     * @param securityProperties provides the allowed origins
+     * @return the CORS configuration used by {@code http.cors()}
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource(SecurityProperties securityProperties)
     {

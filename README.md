@@ -280,6 +280,8 @@ Zero critical security vulnerabilities
 
 ## 🔐 Local security setup
 
+> How the security works, flow by flow, plus study resources: see [docs/SECURITY.md](docs/SECURITY.md).
+
 Authentication supports **email + password** and **Sign in with Google**. Both end with the backend issuing the same RS256 JWT, which the Angular app sends as `Authorization: Bearer <token>`.
 
 ### 1. Generate a JWT key pair (once)
