@@ -278,6 +278,46 @@ Zero critical security vulnerabilities
 
 ---
 
+## 🐳 Run with Docker (recommended)
+
+The only prerequisite is [Docker Desktop](https://www.docker.com/products/docker-desktop/). No Java, Maven, Node or PostgreSQL install needed.
+
+```bash
+cp .env.example .env        # then set DB_PASSWORD (and the Google values if you want Google sign-in)
+docker compose up --build   # first run takes a few minutes; later runs are fast
+```
+
+| What | URL |
+|---|---|
+| Storefront | http://localhost:4200 |
+| API / Swagger | http://localhost:8080/swagger-ui.html |
+| PostgreSQL (pgAdmin, DBeaver...) | `localhost:5433`, credentials from `.env` |
+
+What runs:
+
+- **db** (`postgres:16`): on its very first start it loads `docker/db/init/01-snapshot.sql` (schema + all data, product photos included). Data then lives in the `db-data` volume and survives restarts.
+- **backend**: `backend/eCommerce/Dockerfile` compiles the jar with Maven, then runs it on a slim Java 21 JRE. A JWT key pair is generated on first start into the `jwt-keys` volume.
+- **frontend**: `frontend/eCommerce-client/Dockerfile` builds Angular, then serves the static files with Nginx.
+
+Useful commands:
+
+```bash
+docker compose up -d --build          # start in the background (rebuilds after code changes)
+docker compose logs -f backend        # follow the API logs
+docker compose down                   # stop (data is kept)
+docker compose down -v                # stop AND wipe data -> next start reloads the snapshot
+```
+
+Refresh the snapshot from the running container (e.g. after adding products), so the next fresh machine gets the new data:
+
+```bash
+docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner --no-privileges' > docker/db/init/01-snapshot.sql
+```
+
+> ⚠️ The snapshot contains the customer accounts (emails + BCrypt password hashes). Keep the repository private, or re-dump without them before sharing.
+
+---
+
 ## 🔐 Local security setup
 
 > How the security works, flow by flow, plus study resources: see [docs/SECURITY.md](docs/SECURITY.md).

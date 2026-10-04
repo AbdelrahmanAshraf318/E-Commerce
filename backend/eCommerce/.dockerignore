@@ -1,0 +1,11 @@
+# Only pom.xml and src/ are needed to build the image.
+target/
+keys/
+db/
+.idea/
+.mvn/
+.env
+*.iml
+
+# Google client secret: passed at runtime through docker-compose, never baked into the image.
+src/main/resources/application-secrets.properties
