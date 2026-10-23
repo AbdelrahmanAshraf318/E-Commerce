@@ -1,6 +1,7 @@
 package com.example.eCommerce.user.controller;
 
 import com.example.eCommerce.user.dtos.ChangePasswordRequest;
+import com.example.eCommerce.user.dtos.CustomerOrderDto;
 import com.example.eCommerce.user.dtos.CustomerProfileResponse;
 import com.example.eCommerce.user.dtos.UpdateProfileRequest;
 import com.example.eCommerce.user.services.CustomerService;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -27,6 +30,13 @@ public class CustomerController
     public CustomerProfileResponse getProfile(Authentication authentication)
     {
         return customerService.getProfile(AuthenticationUtil.getUserId(authentication));
+    }
+
+    // Newest first; an empty list when the customer has not ordered anything yet.
+    @GetMapping("/me/orders")
+    public List<CustomerOrderDto> getOrders(Authentication authentication)
+    {
+        return customerService.getAllOrders(AuthenticationUtil.getUserId(authentication));
     }
 
     // Returns the updated profile so the client does not need a second GET.

@@ -95,3 +95,55 @@ export interface Page<T> {
   totalElements: number;
   totalPages: number;
 }
+
+/** Matches backend OrderStatus. */
+export type OrderStatus =
+  | 'SAVED_TO_CART'
+  | 'PENDING_PAYMENT'
+  | 'CONFIRMED'
+  | 'IN_PROGRESS'
+  | 'ON_HOLD'
+  | 'CANCELED'
+  | 'COMPLETED'
+  | 'REQUEST_REFUND';
+
+export interface OrderItem {
+  quantity: number;
+  unitPrice: number;
+  productName: string;
+  totalPrice: number | null;
+}
+
+/** GET /users/me/orders - CustomerOrderDto. */
+export interface CustomerOrder {
+  orderId: number;
+  orderItems: OrderItem[];
+  creationDate: string | null; // ISO local date-time
+  updateDate: string | null;
+  totalPrice: number | null;
+  orderStatus: OrderStatus | null;
+}
+
+/** Matches backend AuditAction. */
+export type AuditAction =
+  | 'ACCOUNT_REGISTERED'
+  | 'SIGNED_IN'
+  | 'PROFILE_UPDATED'
+  | 'PASSWORD_CHANGED'
+  | 'ACCOUNT_DEACTIVATED'
+  | 'ACCOUNT_REACTIVATED'
+  | 'ACCOUNT_DELETED'
+  | 'CART_ITEM_ADDED'
+  | 'CART_ITEM_UPDATED'
+  | 'CART_ITEM_REMOVED'
+  | 'CART_CLEARED';
+
+/** GET /users/me/activity - AuditLogResponse. */
+export interface ActivityEntry {
+  id: number;
+  action: AuditAction;
+  details: string | null;
+  /** Email of whoever was signed in, or "system" (e.g. during sign-in / sign-up). */
+  actor: string;
+  occurredAt: string;
+}

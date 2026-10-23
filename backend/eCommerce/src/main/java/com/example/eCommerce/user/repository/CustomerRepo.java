@@ -23,4 +23,6 @@ public interface CustomerRepo extends JpaRepository<Customer, UUID>
 
     @EntityGraph(attributePaths = "roles")
     Optional<Customer> findWithRolesByUserId(UUID userId);
+
+    boolean existsByRolesName(String admin);
 }

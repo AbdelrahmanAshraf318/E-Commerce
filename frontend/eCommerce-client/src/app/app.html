@@ -33,6 +33,11 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Shop</a>
           </li>
+          @if (auth.isAuthenticated()) {
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/account/orders" routerLinkActive="active">Orders</a>
+            </li>
+          }
         </ul>
 
         <div class="d-flex flex-column flex-md-row align-items-md-center gap-2 py-3 py-md-0 me-md-2">

@@ -43,6 +43,18 @@ export const routes: Routes = [
     loadComponent: () => import('./components/account/account').then((m) => m.Account),
   },
   {
+    path: 'account/orders',
+    title: 'Your orders · SmartCart',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/orders/orders').then((m) => m.Orders),
+  },
+  {
+    path: 'account/activity',
+    title: 'Account activity · SmartCart',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/activity/activity').then((m) => m.Activity),
+  },
+  {
     path: 'account/complete-profile',
     title: 'Complete your profile · SmartCart',
     canActivate: [authGuard],

@@ -8,6 +8,30 @@
   </div>
 
   @if (user(); as u) {
+    <!-- ================= Shortcuts ================= -->
+    <nav class="row g-3 mb-4" aria-label="Account sections">
+      <div class="col-sm-6">
+        <a routerLink="/account/orders" class="surface shortcut fade-up">
+          <span class="section-icon"><i class="bi bi-receipt"></i></span>
+          <span class="flex-grow-1">
+            <span class="d-block fw-bold shortcut-title">Orders</span>
+            <span class="d-block small text-muted">Your order history</span>
+          </span>
+          <i class="bi bi-chevron-right text-muted"></i>
+        </a>
+      </div>
+      <div class="col-sm-6">
+        <a routerLink="/account/activity" class="surface shortcut fade-up">
+          <span class="section-icon"><i class="bi bi-clock-history"></i></span>
+          <span class="flex-grow-1">
+            <span class="d-block fw-bold shortcut-title">Activity</span>
+            <span class="d-block small text-muted">Sign-ins and account changes</span>
+          </span>
+          <i class="bi bi-chevron-right text-muted"></i>
+        </a>
+      </div>
+    </nav>
+
     <!-- ================= Profile ================= -->
     <section class="surface mb-4 fade-up" aria-labelledby="profileHeading">
       <div class="p-4 p-md-5">
