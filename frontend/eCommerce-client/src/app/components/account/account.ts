@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ApiError, applyFieldErrors, controlError, toApiError } from '../../core/api-error';
 import { AuthService } from '../../core/auth/auth.service';
 import { CustomerService } from '../../core/customer.service';
@@ -12,7 +13,7 @@ type DangerAction = 'deactivate' | 'delete';
 /** Covers every /api/v1/users/me endpoint: GET, PATCH, POST /password, PATCH /deactivate, DELETE. */
 @Component({
   selector: 'app-account',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, RouterLink],
   templateUrl: './account.html',
   styleUrl: './account.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

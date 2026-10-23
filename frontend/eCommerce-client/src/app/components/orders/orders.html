@@ -1,0 +1,91 @@
+<div class="container py-4 py-lg-5">
+  <div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-4">
+    <div>
+      <h1 class="page-heading h2 mb-1">Your orders</h1>
+      @if (orders(); as list) {
+        @if (list.length > 0) {
+          <p class="text-muted mb-0">{{ list.length }} {{ list.length === 1 ? 'order' : 'orders' }}</p>
+        }
+      }
+    </div>
+    <a routerLink="/account" class="btn btn-link text-decoration-none fw-semibold px-0"><i class="bi bi-arrow-left me-1"></i>My account</a>
+  </div>
+
+  @if (loadError(); as message) {
+    <div class="alert alert-danger d-flex flex-wrap align-items-center gap-2" role="alert">
+      <span>{{ message }}</span>
+      <button type="button" class="btn btn-sm btn-outline-danger ms-auto" (click)="load()">Try again</button>
+    </div>
+  }
+
+  @if (orders(); as list) {
+    @if (list.length === 0) {
+      <div class="surface text-center py-5 px-3 fade-up">
+        <div class="empty-illustration mx-auto mb-4"><i class="bi bi-receipt"></i></div>
+        <h2 class="h4 fw-bold">No orders yet</h2>
+        <p class="text-muted mb-4">When you place an order, it will show up here.</p>
+        <a routerLink="/products" class="btn btn-primary btn-lg">Start shopping</a>
+      </div>
+    } @else {
+      <ul class="list-unstyled d-grid gap-3 mb-0">
+        @for (order of list; track order.orderId) {
+          @let open = expanded().has(order.orderId);
+          @let state = status(order.orderStatus);
+          <li class="surface order-card fade-up">
+            <button type="button" class="order-head" (click)="toggle(order.orderId)"
+                    [attr.aria-expanded]="open" [attr.aria-controls]="'order-items-' + order.orderId">
+              <div class="order-summary">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                  <span class="order-id">Order #{{ order.orderId }}</span>
+                  <span class="pill pill-dot {{ state.pill }}">{{ state.label }}</span>
+                </div>
+                <div class="text-muted small">
+                  @if (order.creationDate) {
+                    Placed {{ order.creationDate | date: 'mediumDate' }} at {{ order.creationDate | date: 'shortTime' }}
+                  } @else {
+                    Date not recorded
+                  }
+                  · {{ itemCount(order) }} {{ itemCount(order) === 1 ? 'item' : 'items' }}
+                </div>
+              </div>
+              <div class="order-total">{{ order.totalPrice ?? 0 | currency: 'USD' }}</div>
+              <i class="bi bi-chevron-down chevron" [class.is-open]="open" aria-hidden="true"></i>
+            </button>
+
+            @if (open) {
+              <div class="order-items" [id]="'order-items-' + order.orderId">
+                <table class="table table-sm align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th scope="col">Product</th>
+                      <th scope="col" class="text-end">Qty</th>
+                      <th scope="col" class="text-end d-none d-sm-table-cell">Unit price</th>
+                      <th scope="col" class="text-end">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (item of order.orderItems; track $index) {
+                      <tr>
+                        <td class="fw-semibold">{{ item.productName }}</td>
+                        <td class="text-end">{{ item.quantity }}</td>
+                        <td class="text-end d-none d-sm-table-cell">{{ item.unitPrice | currency: 'USD' }}</td>
+                        <td class="text-end">{{ item.totalPrice ?? item.unitPrice * item.quantity | currency: 'USD' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+                @if (order.updateDate) {
+                  <p class="text-muted small mt-3 mb-0">Last updated {{ order.updateDate | date: 'medium' }}</p>
+                }
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  } @else if (!loadError()) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading…</span></div>
+    </div>
+  }
+</div>

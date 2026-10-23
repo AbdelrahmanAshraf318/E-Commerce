@@ -1,9 +1,13 @@
 package com.example.eCommerce.user.services;
 
+import com.example.eCommerce.audit.enums.AuditAction;
+import com.example.eCommerce.audit.service.AuditLogService;
 import com.example.eCommerce.common.enums.ErrorCode;
 import com.example.eCommerce.common.validatePhone.PhoneNumbers;
 import com.example.eCommerce.exception.BusinessException;
+import com.example.eCommerce.order.repository.OrderRepo;
 import com.example.eCommerce.user.dtos.ChangePasswordRequest;
+import com.example.eCommerce.user.dtos.CustomerOrderDto;
 import com.example.eCommerce.user.dtos.CustomerProfileResponse;
 import com.example.eCommerce.user.dtos.UpdateProfileRequest;
 import com.example.eCommerce.user.entity.Customer;
@@ -15,6 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -25,6 +33,8 @@ public class CustomerServiceImpl implements CustomerService
     private final CustomerRepo customerRepo;
     private final CustomerMapper customerMapper;
     private final PasswordEncoder passwordEncoder;
+    private final OrderRepo orderRepo;
+    private final AuditLogService auditLogService;
 
     /**
      * Returns a lazy reference (no SELECT) - meant for linking another entity to the customer, e.g. a new Cart.
@@ -56,7 +66,20 @@ public class CustomerServiceImpl implements CustomerService
                 throw new BusinessException(ErrorCode.PHONE_ALREADY_EXISTS);
         }
 
+        String oldName = customer.getName();
+        LocalDate oldDateOfBirth = customer.getDateOfBirth();
+        String oldPhoneNumber = customer.getPhoneNumber();
+
         customerMapper.mergeUserInfo(customer, updateProfileRequest);
+
+        List<String> changed = new ArrayList<>();
+        if (!Objects.equals(oldName, customer.getName())) changed.add("name");
+        if (!Objects.equals(oldDateOfBirth, customer.getDateOfBirth())) changed.add("date of birth");
+        if (!Objects.equals(oldPhoneNumber, customer.getPhoneNumber())) changed.add("phone number");
+        // Saving the form without changing anything is not an event worth recording.
+        if (!changed.isEmpty())
+            auditLogService.record(userId, AuditAction.PROFILE_UPDATED, "Changed " + String.join(", ", changed));
+
         // No save() needed: the entity is managed, so changes are flushed when the transaction commits.
         return customerMapper.toProfileResponse(customer);
     }
@@ -82,7 +105,9 @@ public class CustomerServiceImpl implements CustomerService
                 throw new BusinessException(ErrorCode.CURRENT_PASSWORD_INCORRECT);
         }
 
+        boolean firstPassword = StringUtils.isEmpty(customer.getPassword());
         customer.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        auditLogService.record(userId, AuditAction.PASSWORD_CHANGED, firstPassword ? "First password set" : null);
         log.info("Password changed for customer {}", userId);
     }
 
@@ -96,6 +121,7 @@ public class CustomerServiceImpl implements CustomerService
             throw new BusinessException(ErrorCode.ACCOUNT_ALREADY_DEACTIVATED);
 
         customer.setEnabled(false);
+        auditLogService.record(userId, AuditAction.ACCOUNT_DEACTIVATED);
         log.info("Deactivated customer {}", userId);
     }
 
@@ -106,7 +132,17 @@ public class CustomerServiceImpl implements CustomerService
         // Orders cascade (CascadeType.ALL + orphanRemoval on Customer.orders); USERS_ROLES rows are removed by Hibernate;
         // the cart is removed by the database (ON DELETE CASCADE on CART.CUSTOMER_ID).
         customerRepo.delete(findCustomer(userId));
+        // Kept on purpose: AUDIT_LOG has no foreign key to CUSTOMER, so the trail outlives the account.
+        auditLogService.record(userId, AuditAction.ACCOUNT_DELETED);
         log.info("Deleted customer {}", userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CustomerOrderDto> getAllOrders(UUID userId)
+    {
+        // No orders is a normal state: an empty list, never null and never an error.
+        return customerMapper.toCustomerOrderDto(orderRepo.findByCustomerUserIdOrderByCreatedAtDesc(userId));
     }
 
     private Customer findCustomer(UUID userId)

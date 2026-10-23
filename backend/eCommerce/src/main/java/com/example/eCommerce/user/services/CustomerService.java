@@ -1,10 +1,12 @@
 package com.example.eCommerce.user.services;
 
 import com.example.eCommerce.user.dtos.ChangePasswordRequest;
+import com.example.eCommerce.user.dtos.CustomerOrderDto;
 import com.example.eCommerce.user.dtos.CustomerProfileResponse;
 import com.example.eCommerce.user.dtos.UpdateProfileRequest;
 import com.example.eCommerce.user.entity.Customer;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,4 +27,6 @@ public interface CustomerService
     void deactivateAccount(UUID userId);
 
     void deleteAccount(UUID userId);
+
+    List<CustomerOrderDto> getAllOrders(UUID userId);
 }

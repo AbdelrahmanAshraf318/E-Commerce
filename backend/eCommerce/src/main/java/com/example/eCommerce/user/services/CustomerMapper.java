@@ -1,6 +1,10 @@
 package com.example.eCommerce.user.services;
 
 import com.example.eCommerce.common.validatePhone.PhoneNumbers;
+import com.example.eCommerce.order.dtos.OrderItemDto;
+import com.example.eCommerce.order.entity.Order;
+import com.example.eCommerce.order.entity.OrderItem;
+import com.example.eCommerce.user.dtos.CustomerOrderDto;
 import com.example.eCommerce.user.dtos.CustomerProfileResponse;
 import com.example.eCommerce.user.dtos.UpdateProfileRequest;
 import com.example.eCommerce.user.entity.Customer;
@@ -8,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -53,5 +58,31 @@ public class CustomerMapper
                 customer.isProfileComplete(),
                 customer.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()
         );
+    }
+
+    public List<CustomerOrderDto> toCustomerOrderDto(List<Order> customerOrders)
+    {
+        return customerOrders.stream().map(this::toCustomerOrderDto).toList();
+    }
+
+    private CustomerOrderDto toCustomerOrderDto(Order order)
+    {
+        List<OrderItemDto> items = order.getOrderItem() == null
+                ? List.of()
+                : order.getOrderItem().stream().map(this::toOrderItemDto).toList();
+
+        return new CustomerOrderDto(
+                order.getOrderId(),
+                items,
+                order.getCreatedAt(),
+                order.getUpdatedAt(),
+                order.getTotalOrderPrice(),
+                order.getOrderStatus()
+        );
+    }
+
+    private OrderItemDto toOrderItemDto(OrderItem item)
+    {
+        return new OrderItemDto(item.getQuantity(), item.getUnitPrice(), item.getProductName(), item.getTotalPrice());
     }
 }

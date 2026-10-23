@@ -1,5 +1,7 @@
 package com.example.eCommerce.user.services;
 
+import com.example.eCommerce.audit.enums.AuditAction;
+import com.example.eCommerce.audit.service.AuditLogService;
 import com.example.eCommerce.common.enums.ErrorCode;
 import com.example.eCommerce.common.validatePhone.PhoneNumbers;
 import com.example.eCommerce.exception.BusinessException;
@@ -39,6 +41,7 @@ public class AuthServiceImpl implements AuthService
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional
@@ -63,12 +66,14 @@ public class AuthServiceImpl implements AuthService
         customer.setRoles(new ArrayList<>(List.of(customerRole())));
 
         customerRepo.save(customer);
+        auditLogService.record(customer.getUserId(), AuditAction.ACCOUNT_REGISTERED, "Signed up with email");
         log.info("Registered local customer {}", customer.getUserId());
         return issueToken(customer);
     }
 
+    // Not readOnly: a successful login writes an audit entry, and a read-only transaction would never flush it.
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponse login(UserLoginRequest request)
     {
         String email = normalizeEmail(request.getEmail());
@@ -76,7 +81,9 @@ public class AuthServiceImpl implements AuthService
         {
             Authentication authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken.unauthenticated(email, request.getPassword()));
-            return issueToken((Customer) authentication.getPrincipal());
+            Customer customer = (Customer) authentication.getPrincipal();
+            auditLogService.record(customer.getUserId(), AuditAction.SIGNED_IN, "Email and password");
+            return issueToken(customer);
         }
         catch (DisabledException e)
         {
@@ -112,6 +119,7 @@ public class AuthServiceImpl implements AuthService
             throw new BusinessException(ErrorCode.ACCOUNT_ALREADY_ACTIVATED);
 
         customer.setEnabled(true);
+        auditLogService.record(customer.getUserId(), AuditAction.ACCOUNT_REACTIVATED, "Email and password");
         log.info("Reactivated customer {}", customer.getUserId());
         return issueToken(customer);
     }
@@ -137,8 +145,11 @@ public class AuthServiceImpl implements AuthService
         if (!customer.isEnabled())
         {
             customer.setEnabled(true);
+            auditLogService.record(customer.getUserId(), AuditAction.ACCOUNT_REACTIVATED, "Signed in with " + providerName(provider));
             log.info("Reactivated customer {} via {}", customer.getUserId(), provider);
         }
+
+        auditLogService.record(customer.getUserId(), AuditAction.SIGNED_IN, providerName(provider));
 
         return jwtService.generateToken(customer);
     }
@@ -152,6 +163,7 @@ public class AuthServiceImpl implements AuthService
         customer.setRoles(new ArrayList<>(List.of(customerRole())));
 
         customerRepo.save(customer);
+        auditLogService.record(customer.getUserId(), AuditAction.ACCOUNT_REGISTERED, "Signed up with " + providerName(provider));
         log.info("Created {} customer {} on first sign-in", provider, customer.getUserId());
         return customer;
     }
@@ -173,6 +185,12 @@ public class AuthServiceImpl implements AuthService
     {
         return roleRepo.findByName(Role.CUSTOMER)
                 .orElseThrow(() -> new IllegalStateException(Role.CUSTOMER + " is missing - RoleSeeder did not run"));
+    }
+
+    /** GOOGLE -> "Google", for human-readable audit details. */
+    private static String providerName(AuthProvider provider)
+    {
+        return StringUtils.capitalize(provider.name().toLowerCase(Locale.ROOT));
     }
 
     private static String normalizeEmail(String email)

@@ -36,7 +36,7 @@ public class KeyUtils
      * @throws IllegalStateException if the file is missing, unreadable or not a PKCS#8 RSA private key -
      *                               thrown at startup so a misconfigured server never starts
      */
-    public static RSAPrivateKey loadPrivateKey(Resource pem)
+    public RSAPrivateKey loadPrivateKey(Resource pem)
     {
         byte[] der = decodePem(pem, "PRIVATE KEY");
         try
@@ -59,7 +59,7 @@ public class KeyUtils
      * @return the public key
      * @throws IllegalStateException if the file is missing, unreadable or not an X.509 RSA public key
      */
-    public static RSAPublicKey loadPublicKey(Resource pem)
+    public RSAPublicKey loadPublicKey(Resource pem)
     {
         byte[] der = decodePem(pem, "PUBLIC KEY");
         try
@@ -81,7 +81,7 @@ public class KeyUtils
      * @return the Base64-decoded key bytes
      * @throws IllegalStateException if the file does not exist or cannot be read
      */
-    private static byte[] decodePem(Resource pem, String type)
+    private byte[] decodePem(Resource pem, String type)
     {
         if (!pem.exists())
             throw new IllegalStateException("Key file not found: " + pem.getDescription()

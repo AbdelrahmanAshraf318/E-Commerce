@@ -1,5 +1,7 @@
 package com.example.eCommerce.cart.service;
 
+import com.example.eCommerce.audit.enums.AuditAction;
+import com.example.eCommerce.audit.service.AuditLogService;
 import com.example.eCommerce.cart.dtos.AddCartItemRequest;
 import com.example.eCommerce.cart.dtos.CartResponse;
 import com.example.eCommerce.cart.dtos.UpdateCartItemRequest;
@@ -29,6 +31,7 @@ public class CartServiceImpl implements CartService
     private final CartMapper cartMapper;
     private final ProductService productService;
     private final CustomerService customerService;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional(readOnly = true)
@@ -62,6 +65,8 @@ public class CartServiceImpl implements CartService
             cart.touch();
         }
 
+        auditLogService.record(userId, AuditAction.CART_ITEM_ADDED, request.quantity() + " x " + product.getProductName());
+
         return cartMapper.toResponse(cart);
     }
 
@@ -73,8 +78,12 @@ public class CartServiceImpl implements CartService
         CartItem item = findItem(cart, productId);
 
         ensurePurchasable(item.getProduct(), request.quantity());
+        int oldQuantity = item.getQuantity();
         item.setQuantity(request.quantity());
         cart.touch();
+
+        auditLogService.record(userId, AuditAction.CART_ITEM_UPDATED,
+                item.getProduct().getProductName() + ": quantity " + oldQuantity + " -> " + request.quantity());
 
         return cartMapper.toResponse(cart);
     }
@@ -85,7 +94,9 @@ public class CartServiceImpl implements CartService
     {
         Cart cart = findCart(userId, productId);
         // Removing must always work - including lines whose product has since become unavailable.
-        cart.removeItem(findItem(cart, productId));
+        CartItem item = findItem(cart, productId);
+        cart.removeItem(item);
+        auditLogService.record(userId, AuditAction.CART_ITEM_REMOVED, item.getProduct().getProductName());
         return cartMapper.toResponse(cart);
     }
 
@@ -93,7 +104,13 @@ public class CartServiceImpl implements CartService
     @Transactional
     public void clearCart(UUID userId)
     {
-        cartRepo.findByCustomerUserId(userId).ifPresent(Cart::clear);
+        // Emptying an already-empty cart changes nothing, so it is not recorded.
+        cartRepo.findByCustomerUserId(userId)
+                .filter(cart -> !cart.getCartItems().isEmpty())
+                .ifPresent(cart -> {
+                    cart.clear();
+                    auditLogService.record(userId, AuditAction.CART_CLEARED);
+                });
     }
 
     private Cart createCart(UUID userId)

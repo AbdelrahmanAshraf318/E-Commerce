@@ -1,6 +1,7 @@
 package com.example.eCommerce.user.entity;
 
 import com.example.eCommerce.order.entity.Order;
+import com.example.eCommerce.user.enums.AccountStatus;
 import com.example.eCommerce.user.enums.AuthProvider;
 import com.example.eCommerce.user.role.Role;
 import jakarta.persistence.*;
@@ -76,6 +77,10 @@ public class Customer implements UserDetails
             inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
     )
     private List<Role> roles = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ACCOUNT_STATUS", nullable = false)
+    private AccountStatus status;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities()

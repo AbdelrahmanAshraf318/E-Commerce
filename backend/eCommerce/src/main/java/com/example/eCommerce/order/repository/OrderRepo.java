@@ -1,6 +1,7 @@
 package com.example.eCommerce.order.repository;
 
 import com.example.eCommerce.order.entity.Order;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.stereotype.Repository;
@@ -16,4 +17,11 @@ public interface OrderRepo extends  JpaRepository<Order, Long>
 
     @NativeQuery(value = "SELECT MAX(TOTAL_PRICE) WHERE USER_ID = ?1")
     Order findMaxOrderByUserId(UUID userId);
+
+    /**
+     * Newest first, with the items in the same query (no N+1: one SELECT instead of one per order).
+     * Derived query: "CustomerUserId" walks Order.customer.userId.
+     */
+    @EntityGraph(attributePaths = "orderItem")
+    List<Order> findByCustomerUserIdOrderByCreatedAtDesc(UUID userId);
 }

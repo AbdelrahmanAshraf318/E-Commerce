@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SmartCart — Roadmap &amp; Feature Ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 15mm 15mm 17mm 15mm; }
+  @page cover { margin: 0; }
+
+  :root {
+    --ink: #0f172a; --text: #334155; --muted: #64748b; --line: #e2e8f0; --soft: #f1f5f9;
+    --primary: #4f46e5; --primary-soft: #eef2ff; --violet: #7c3aed;
+    --green: #047857; --green-bg: #ecfdf5; --amber: #b45309; --amber-bg: #fffbeb; --red: #b91c1c; --red-bg: #fef2f2;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-variant-ligatures: none; font-feature-settings: 'calt' 0, 'liga' 0; font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; color: var(--text); font-size: 9pt; line-height: 1.48; }
+  h1, h2, h3, h4 { color: var(--ink); letter-spacing: -0.02em; margin: 0; }
+  h2 { font-size: 18pt; font-weight: 800; margin-bottom: 3mm; }
+  h3 { font-size: 12pt; font-weight: 700; margin: 5mm 0 2mm; }
+  h4 { font-size: 11pt; font-weight: 700; }
+  p { margin: 0 0 1.8mm; }
+  ul, ol { margin: 0 0 2.5mm; padding-left: 5mm; }
+  li { margin-bottom: 0.6mm; }
+  code { font-family: 'JetBrains Mono', Consolas, monospace; font-size: 8.6pt; background: var(--soft); padding: 0.3mm 1.2mm; border-radius: 1mm; color: #3730a3; }
+  pre { font-family: 'JetBrains Mono', Consolas, monospace; font-size: 8.2pt; background: #0f172a; color: #e2e8f0; padding: 3.5mm 4mm; border-radius: 2.5mm; margin: 2mm 0 3mm; white-space: pre-wrap; break-inside: avoid; line-height: 1.5; }
+  pre .c { color: #94a3b8; } pre .k { color: #a5b4fc; } pre .s { color: #86efac; }
+  strong { color: var(--ink); }
+
+  /* ---------- Cover ---------- */
+  .cover { page: cover; height: 297mm; width: 210mm; position: relative; overflow: hidden; color: #fff;
+    background: radial-gradient(120mm 90mm at 85% 8%, rgba(192, 38, 211, 0.45), transparent 70%),
+                radial-gradient(140mm 110mm at 5% 95%, rgba(79, 70, 229, 0.55), transparent 70%),
+                linear-gradient(150deg, #1e1b4b 0%, #312e81 55%, #4c1d95 100%);
+    padding: 28mm 22mm; display: flex; flex-direction: column; break-after: page; }
+  .cover .mark { width: 18mm; height: 18mm; border-radius: 5mm; display: grid; place-items: center; font-weight: 800; font-size: 20pt;
+    background: linear-gradient(135deg, #818cf8, #c084fc); box-shadow: 0 6mm 14mm -6mm rgba(0,0,0,.5); }
+  .cover .kicker { margin-top: 48mm; text-transform: uppercase; letter-spacing: 0.25em; font-size: 9pt; font-weight: 700; color: #c7d2fe; }
+  .cover h1 { color: #fff; font-size: 40pt; line-height: 1.05; font-weight: 800; letter-spacing: -0.04em; margin: 4mm 0 6mm; }
+  .cover h1 span { background: linear-gradient(90deg, #a5b4fc, #f0abfc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .cover .lead { font-size: 13pt; color: #e0e7ff; max-width: 140mm; line-height: 1.5; }
+  .cover .tags { display: flex; flex-wrap: wrap; gap: 2.5mm; margin-top: 10mm; }
+  .cover .tags span { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); padding: 1.5mm 4mm; border-radius: 10mm; font-size: 9pt; font-weight: 600; }
+  .cover .meta { margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; border-top: 1px solid rgba(255,255,255,.2); padding-top: 7mm; }
+  .cover .meta div small { display: block; color: #a5b4fc; text-transform: uppercase; letter-spacing: .12em; font-size: 7.5pt; font-weight: 700; margin-bottom: 1mm; }
+  .cover .meta div { font-size: 10.5pt; font-weight: 600; }
+
+  /* ---------- Layout helpers ---------- */
+  .section { break-before: page; }
+  .eyebrow { display: inline-block; text-transform: uppercase; letter-spacing: .14em; font-size: 7.5pt; font-weight: 800; color: var(--primary); margin-bottom: 2mm; }
+  .intro { font-size: 10.5pt; color: var(--text); max-width: 170mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+  .card { border: 1px solid var(--line); border-radius: 3mm; padding: 3.4mm 4mm; background: #fff; break-inside: avoid; }
+  .card.soft { background: var(--soft); border-color: transparent; }
+  .card h4 { margin-bottom: 1.5mm; }
+  .stat { font-size: 20pt; font-weight: 800; color: var(--ink); line-height: 1.1; }
+  .stat small { display: block; font-size: 8pt; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; margin-top: 1mm; }
+  .callout { border-left: 1.2mm solid var(--primary); background: var(--primary-soft); padding: 3mm 4mm; border-radius: 0 2.5mm 2.5mm 0; margin: 3mm 0; break-inside: avoid; color: #312e81; }
+  .callout.warn { border-color: #f59e0b; background: var(--amber-bg); color: #78350f; }
+  .callout.danger { border-color: #ef4444; background: var(--red-bg); color: #7f1d1d; }
+
+  /* ---------- Tables ---------- */
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 3mm; font-size: 8.5pt; break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  th { text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; padding: 2mm 2.5mm; border-bottom: 1.5px solid var(--ink); }
+  td { padding: 1.3mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child { font-weight: 600; color: var(--ink); }
+
+  /* ---------- Pills ---------- */
+  .pill { display: inline-block; padding: 0.4mm 2.4mm; border-radius: 10mm; font-size: 7.5pt; font-weight: 700; white-space: nowrap; }
+  .done { background: var(--green-bg); color: var(--green); }
+  .partial { background: var(--amber-bg); color: var(--amber); }
+  .todo { background: var(--red-bg); color: var(--red); }
+  .now { background: #4f46e5; color: #fff; } .next { background: #c7d2fe; color: #312e81; } .later { background: var(--soft); color: var(--text); }
+
+  /* ---------- Phase header ---------- */
+  .phase-head { display: flex; align-items: center; gap: 4mm; margin-bottom: 3mm; }
+  .phase-num { width: 13mm; height: 13mm; border-radius: 3.5mm; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 14pt; flex-shrink: 0;
+    background: linear-gradient(135deg, #6366f1, #4f46e5 55%, #7c3aed); }
+  .phase-head h2 { margin: 0; }
+  .phase-head p { margin: 0; color: var(--muted); font-size: 9.5pt; }
+  .phase-meta { display: flex; flex-wrap: wrap; gap: 2mm; margin: 0 0 3mm; }
+  .phase-meta span { background: var(--soft); border-radius: 10mm; padding: 1mm 3mm; font-size: 8.3pt; font-weight: 600; color: var(--ink); }
+
+  /* ---------- Idea blocks ---------- */
+  .idea { border: 1px solid var(--line); border-radius: 3mm; padding: 3.2mm 4mm 2.4mm; margin-bottom: 3mm; break-inside: avoid; }
+  .idea-top { display: flex; justify-content: space-between; align-items: baseline; gap: 4mm; margin-bottom: 1.4mm; }
+  .idea-top .chips { display: flex; gap: 1.5mm; flex-shrink: 0; }
+  .chip { font-size: 7.5pt; font-weight: 700; padding: 0.5mm 2.2mm; border-radius: 10mm; background: var(--soft); color: var(--text); white-space: nowrap; }
+  .chip.e { background: var(--primary-soft); color: #3730a3; }
+  .label { font-weight: 700; color: var(--ink); }
+  .dw { background: var(--green-bg); color: #064e3b; border-radius: 2mm; padding: 1.4mm 3mm; font-size: 8.6pt; margin-top: 1.5mm; }
+
+  /* ---------- Timeline ---------- */
+  .gantt { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 8.3pt; }
+  .gantt th { border: 0; text-align: center; padding: 1mm 0; font-size: 7pt; }
+  .gantt td { border: 0; padding: 1.2mm 0; }
+  .gantt td.name { width: 46mm; padding-right: 3mm; font-weight: 600; color: var(--ink); }
+  .gantt td.cell { border-left: 1px dashed var(--line); position: relative; height: 7mm; }
+  .bar { position: absolute; top: 1.4mm; bottom: 1.4mm; border-radius: 10mm; }
+  .b0 { background: #64748b; } .b1 { background: #4f46e5; } .b2 { background: #7c3aed; } .b3 { background: #0891b2; }
+  .b4 { background: #db2777; } .b5 { background: #ea580c; } .b6 { background: #16a34a; } .b7 { background: #ca8a04; }
+
+  .toc { columns: 2; column-gap: 10mm; font-size: 10pt; }
+  .toc div { display: flex; justify-content: space-between; border-bottom: 1px dotted #cbd5e1; padding: 1.6mm 0; break-inside: avoid; }
+  .toc b { color: var(--primary); margin-right: 2mm; }
+
+  svg text { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .small { font-size: 8.5pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- =============================== COVER =============================== -->
+<section class="cover">
+  <div class="mark">S</div>
+  <div class="kicker">Product roadmap · Feature ideas</div>
+  <h1>SmartCart:<br><span>what to build next</span></h1>
+  <p class="lead">A detailed, prioritised plan to take SmartCart from a secure storefront with a cart to a complete, production-ready e-commerce platform: checkout, payments, an admin panel, a richer shopping experience, and a path to scale.</p>
+  <div class="tags">
+    <span>Spring Boot 4</span><span>Angular 22</span><span>PostgreSQL</span><span>JWT + OAuth2</span><span>Docker</span>
+  </div>
+  <div class="meta">
+    <div><small>Project</small>SmartCart e-commerce</div>
+    <div><small>Version</small>Roadmap v1.0</div>
+    <div><small>Date</small>October 2026</div>
+  </div>
+</section>
+
+<!-- =============================== CONTENTS =============================== -->
+<section>
+  <span class="eyebrow">Contents</span>
+  <h2>What's inside</h2>
+  <div class="toc">
+    <div><span><b>1</b>Executive summary</span></div>
+    <div><span><b>2</b>Where SmartCart stands today</span></div>
+    <div><span><b>3</b>Phase 0: Foundations &amp; hardening</span></div>
+    <div><span><b>4</b>Phase 1: Checkout &amp; orders</span></div>
+    <div><span><b>5</b>Phase 2: Payments</span></div>
+    <div><span><b>6</b>Phase 3: Admin &amp; inventory</span></div>
+    <div><span><b>7</b>Phase 4: Customer experience</span></div>
+    <div><span><b>8</b>Phase 5: Identity &amp; security</span></div>
+    <div><span><b>9</b>Phase 6: Performance &amp; scale</span></div>
+    <div><span><b>10</b>Phase 7: DevOps &amp; deployment</span></div>
+    <div><span><b>11</b>Innovation ideas (AI &amp; more)</span></div>
+    <div><span><b>12</b>Prioritisation matrix</span></div>
+    <div><span><b>13</b>Timeline</span></div>
+    <div><span><b>14</b>Success metrics &amp; learning resources</span></div>
+  </div>
+
+  <h3 style="margin-top:10mm">How to read each idea</h3>
+  <div class="grid2">
+    <div class="card soft">
+      <h4>Every idea answers four questions</h4>
+      <ul>
+        <li><span class="label">Why:</span> the user or business value</li>
+        <li><span class="label">How:</span> the technical approach in this codebase</li>
+        <li><span class="label">Done when:</span> a checkable finish line</li>
+        <li><span class="label">Chips:</span> effort and priority</li>
+      </ul>
+    </div>
+    <div class="card soft">
+      <h4>Effort scale (one developer)</h4>
+      <table style="margin:0">
+        <tr><td>S</td><td>1–2 days</td></tr>
+        <tr><td>M</td><td>3–5 days</td></tr>
+        <tr><td>L</td><td>1–2 weeks</td></tr>
+        <tr><td>XL</td><td>3+ weeks</td></tr>
+      </table>
+    </div>
+  </div>
+  <p class="small" style="margin-top:4mm">Priority: <span class="pill now">Now</span> needed before going live · <span class="pill next">Next</span> high value, right after · <span class="pill later">Later</span> nice to have or for scale.</p>
+</section>
+
+<!-- =============================== 1. SUMMARY =============================== -->
+<section class="section">
+  <span class="eyebrow">1 · Executive summary</span>
+  <h2>From storefront to platform</h2>
+  <p class="intro">SmartCart already has the hardest-to-retrofit parts done properly: a secure identity layer (email and Google sign-in, RS256 JWTs, instant revocation), a server-side cart with stock checks, an audit log, a modern responsive UI with dark mode, and a Docker Compose setup. What's missing is the part that makes it a shop: <strong>customers can't pay yet</strong>. This roadmap closes that gap first, then adds the admin, experience and scale features in an order where every phase ships something usable.</p>
+
+  <div class="grid3" style="margin:4mm 0">
+    <div class="card"><div class="stat">8<small>Phases</small></div></div>
+    <div class="card"><div class="stat">40+<small>Concrete ideas</small></div></div>
+    <div class="card"><div class="stat">~6<small>Months</small></div></div>
+  </div>
+
+  <h3>Guiding principles</h3>
+  <div class="grid2">
+    <div class="card"><h4>1. Ship the money path first</h4><p>Checkout → payment → order management is the critical path. Everything else is secondary until a customer can buy something end to end.</p></div>
+    <div class="card"><h4>2. Keep the modular monolith</h4><p>Stay one deployable, but enforce module boundaries (user, product, cart, order, payment, inventory, audit) so services can be split out later without a rewrite.</p></div>
+    <div class="card"><h4>3. Correctness over cleverness</h4><p>Money and stock need transactions, idempotency and tests. Snapshot prices into orders and never trust the client with totals.</p></div>
+    <div class="card"><h4>4. Every phase is demo-able</h4><p>Each phase ends with a working feature, tests and an updated demo video (<code>tools/demo-video</code>).</p></div>
+  </div>
+
+  <h3>The phases at a glance</h3>
+  <table>
+    <thead><tr><th style="width:14mm">#</th><th>Phase</th><th>Outcome</th><th style="width:22mm">Effort</th><th style="width:20mm">Priority</th></tr></thead>
+    <tr><td>0</td><td>Foundations &amp; hardening</td><td>Migrations, tests, CI, secrets rotated, rate limiting</td><td>L</td><td><span class="pill now">Now</span></td></tr>
+    <tr><td>1</td><td>Checkout &amp; orders</td><td>Cart becomes an order; stock is reserved safely</td><td>XL</td><td><span class="pill now">Now</span></td></tr>
+    <tr><td>2</td><td>Payments</td><td>Stripe payments, webhooks, refunds</td><td>L</td><td><span class="pill now">Now</span></td></tr>
+    <tr><td>3</td><td>Admin &amp; inventory</td><td>Product CRUD, order management, stock ledger, dashboard</td><td>XL</td><td><span class="pill next">Next</span></td></tr>
+    <tr><td>4</td><td>Customer experience</td><td>Filters, addresses, wishlist, reviews, coupons, Arabic/RTL</td><td>XL</td><td><span class="pill next">Next</span></td></tr>
+    <tr><td>5</td><td>Identity &amp; security</td><td>Email verification, password reset, refresh tokens, 2FA</td><td>L</td><td><span class="pill next">Next</span></td></tr>
+    <tr><td>6</td><td>Performance &amp; scale</td><td>Caching, CDN images, search, events, load tests</td><td>L</td><td><span class="pill later">Later</span></td></tr>
+    <tr><td>7</td><td>DevOps &amp; deployment</td><td>Cloud deploy, HTTPS, monitoring, backups</td><td>M–L</td><td><span class="pill next">Next</span></td></tr>
+  </table>
+</section>
+
+<!-- =============================== 2. TODAY =============================== -->
+<section class="section">
+  <span class="eyebrow">2 · Baseline</span>
+  <h2>Where SmartCart stands today</h2>
+  <p class="intro">An honest inventory of the codebase as of October 2026, so every phase starts from facts.</p>
+
+  <table>
+    <thead><tr><th style="width:34mm">Module</th><th style="width:22mm">Status</th><th>What exists</th><th>Gap</th></tr></thead>
+    <tr><td>Security / user</td><td><span class="pill done">Done</span></td><td>Email + Google sign-in, RS256 JWT, BCrypt, profile, password change, deactivate/reactivate/delete, roles (CUSTOMER, ADMIN), admin seeding</td><td>Email verification, password reset, refresh tokens, rate limiting</td></tr>
+    <tr><td>Product</td><td><span class="pill partial">Read-only</span></td><td>Public catalogue with search, pagination, detail, images (bytea + ETag), categories and brands</td><td>Admin CRUD, filters/sorting, variants</td></tr>
+    <tr><td>Cart</td><td><span class="pill done">Done</span></td><td>Server-side cart, stock and per-line limits, currency guard, optimistic locking</td><td>Guest cart, saved-for-later</td></tr>
+    <tr><td>Order</td><td><span class="pill partial">Partial</span></td><td>Entities, full status enum, read-only order history</td><td><strong>No checkout</strong>; legacy <code>saveOrderToCart</code> to remove</td></tr>
+    <tr><td>Payment</td><td><span class="pill todo">Empty</span></td><td>Package placeholder</td><td>Everything</td></tr>
+    <tr><td>Inventory</td><td><span class="pill todo">Empty</span></td><td>Stock is a column on <code>product</code></td><td>Reservations, stock ledger, alerts</td></tr>
+    <tr><td>Audit</td><td><span class="pill done">Done</span></td><td>Per-user activity log for account and cart events</td><td>Admin actions, order and payment events</td></tr>
+    <tr><td>Frontend</td><td><span class="pill done">Done</span></td><td>Shop, product, cart, account, orders, activity, auth pages; dark mode; toasts</td><td>Checkout UI, admin UI</td></tr>
+    <tr><td>DevOps</td><td><span class="pill partial">Partial</span></td><td>Dockerfiles + Compose (db, backend, frontend), demo-video recorder</td><td>CI/CD, cloud deploy, monitoring</td></tr>
+  </table>
+
+  <div class="callout danger"><strong>Known risks to fix first (Phase 0):</strong> an old RSA private key in git history, a Google client secret possibly in history, <code>ddl-auto=update</code> instead of migrations, <code>debug=true</code> in <code>application.properties</code>, no rate limiting on login, and very few automated tests.</div>
+
+</section>
+
+<section class="section">
+  <span class="eyebrow">2 · Baseline (continued)</span>
+  <div style="break-inside: avoid">
+  <h3 style="margin-top:0">Target architecture (end of roadmap)</h3>
+  <svg viewBox="0 0 700 255" width="100%" style="margin-top:2mm">
+    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#94a3b8"/></marker></defs>
+    <rect x="10" y="10" width="140" height="56" rx="10" fill="#eef2ff" stroke="#c7d2fe"/><text x="80" y="34" text-anchor="middle" font-size="12" font-weight="700" fill="#312e81">Angular SPA</text><text x="80" y="51" text-anchor="middle" font-size="9" fill="#475569">storefront + admin</text>
+    <rect x="10" y="90" width="140" height="44" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/><text x="80" y="117" text-anchor="middle" font-size="11" font-weight="600" fill="#0f172a">CDN (images, SPA)</text>
+    <rect x="10" y="158" width="140" height="44" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/><text x="80" y="185" text-anchor="middle" font-size="11" font-weight="600" fill="#0f172a">Stripe / Google</text>
+    <line x1="150" y1="38" x2="196" y2="38" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="150" y1="180" x2="196" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar)"/>
+    <rect x="200" y="10" width="330" height="235" rx="14" fill="#fff" stroke="#4f46e5" stroke-width="1.6"/>
+    <text x="365" y="30" text-anchor="middle" font-size="12" font-weight="800" fill="#4f46e5">Spring Boot modular monolith</text>
+    <g font-size="10" font-weight="600" fill="#0f172a">
+      <rect x="215" y="42" width="95" height="34" rx="8" fill="#eef2ff"/><text x="262" y="63" text-anchor="middle">Security</text>
+      <rect x="318" y="42" width="95" height="34" rx="8" fill="#eef2ff"/><text x="365" y="63" text-anchor="middle">User</text>
+      <rect x="421" y="42" width="95" height="34" rx="8" fill="#eef2ff"/><text x="468" y="63" text-anchor="middle">Product</text>
+      <rect x="215" y="84" width="95" height="34" rx="8" fill="#eef2ff"/><text x="262" y="105" text-anchor="middle">Cart</text>
+      <rect x="318" y="84" width="95" height="34" rx="8" fill="#ede9fe"/><text x="365" y="105" text-anchor="middle">Order ★</text>
+      <rect x="421" y="84" width="95" height="34" rx="8" fill="#ede9fe"/><text x="468" y="105" text-anchor="middle">Payment ★</text>
+      <rect x="215" y="126" width="95" height="34" rx="8" fill="#ede9fe"/><text x="262" y="147" text-anchor="middle">Inventory ★</text>
+      <rect x="318" y="126" width="95" height="34" rx="8" fill="#ede9fe"/><text x="365" y="147" text-anchor="middle">Admin ★</text>
+      <rect x="421" y="126" width="95" height="34" rx="8" fill="#eef2ff"/><text x="468" y="147" text-anchor="middle">Audit</text>
+      <rect x="215" y="168" width="301" height="30" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/><text x="365" y="187" text-anchor="middle" font-size="9.5">Domain events → transactional outbox ★</text>
+      <rect x="215" y="204" width="301" height="30" rx="8" fill="#f5f3ff" stroke="#ddd6fe"/><text x="365" y="223" text-anchor="middle" font-size="9.5">Notifications (email) ★ · Search ★ · Cache ★</text>
+    </g>
+    <line x1="530" y1="80" x2="566" y2="60" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="530" y1="130" x2="566" y2="130" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="530" y1="200" x2="566" y2="200" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar)"/>
+    <rect x="570" y="36" width="120" height="48" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/><text x="630" y="58" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">PostgreSQL</text><text x="630" y="73" text-anchor="middle" font-size="9" fill="#475569">Flyway migrations</text>
+    <rect x="570" y="106" width="120" height="48" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/><text x="630" y="128" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">Redis</text><text x="630" y="143" text-anchor="middle" font-size="9" fill="#475569">cache · rate limits</text>
+    <rect x="570" y="176" width="120" height="48" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/><text x="630" y="198" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">Object storage</text><text x="630" y="213" text-anchor="middle" font-size="9" fill="#475569">product images</text>
+  </svg>
+  <p class="small">★ = new in this roadmap.</p>
+  </div>
+
+  <h3>Module boundaries (target)</h3>
+  <p>Each module owns its tables and exposes a small service API. Other modules may call that API, or listen to its events, but never touch its repositories. <strong>Spring Modulith</strong> (idea 0.7) can verify these rules in a test, so the monolith stays splittable.</p>
+  <table>
+    <thead><tr><th style="width:24mm">Module</th><th>Owns</th><th>May depend on</th><th>Publishes events</th></tr></thead>
+    <tr><td>user</td><td>customer, roles, addresses</td><td>(none)</td><td>CustomerRegistered, CustomerDeleted</td></tr>
+    <tr><td>security</td><td>token issuing and verification</td><td>user</td><td>(none)</td></tr>
+    <tr><td>product</td><td>product, category, brand, images</td><td>(none)</td><td>ProductPriceChanged, ProductDeactivated</td></tr>
+    <tr><td>inventory</td><td>stock levels, stock_movement</td><td>product</td><td>StockLow, StockReplenished</td></tr>
+    <tr><td>cart</td><td>cart, cart_item</td><td>user, product, inventory (read)</td><td>(none)</td></tr>
+    <tr><td>order</td><td>orders, order_item, status history</td><td>user, cart, inventory</td><td>OrderPlaced, OrderCanceled, OrderCompleted</td></tr>
+    <tr><td>payment</td><td>payment, processed_webhook_event</td><td>order</td><td>PaymentSucceeded, PaymentFailed, RefundIssued</td></tr>
+    <tr><td>notification</td><td>email templates, outbox</td><td>listens to events only</td><td>(none)</td></tr>
+    <tr><td>audit</td><td>audit_log</td><td>listens to events only</td><td>(none)</td></tr>
+    <tr><td>admin</td><td>(no tables)</td><td>product, inventory, order, user</td><td>(none)</td></tr>
+  </table>
+  <div class="callout">Notice that <strong>notification</strong> and <strong>audit</strong> depend on nothing; they only react to events. That's what lets them become separate services first, as described in 6.5.</div>
+</section>
+
+<!-- =============================== PHASE 0 =============================== -->
+<section class="section">
+  <span class="eyebrow">3 · Phase 0</span>
+  <div class="phase-head"><div class="phase-num">0</div><div><h2>Foundations &amp; hardening</h2><p>Do this before adding features. Every later phase is safer and faster because of it.</p></div></div>
+  <div class="phase-meta"><span>Effort: L (≈ 2 weeks)</span><span>Priority: Now</span><span>Depends on: nothing</span></div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>0.1 Rotate leaked secrets and clean the config</h4><div class="chips"><span class="chip e">S</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">Why:</span> an RSA private key was committed in <code>29d697c</code> and is on GitHub; commit <code>966f65e</code> may contain the Google client secret. Deleting files doesn't remove them from history.</p>
+    <p><span class="label">How:</span> generate a new key pair (already git-ignored), create a new Google client secret and revoke the old one, then optionally rewrite history with <code>git filter-repo</code>. Remove <code>debug=true</code>. Split configuration into Spring profiles: <code>application-dev.properties</code> (show SQL, permissive CORS) and <code>application-prod.properties</code> (strict, everything from environment variables).</p>
+    <div class="dw"><strong>Done when:</strong> no secret in the current tree or history is still valid, and the prod profile starts only from environment variables.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>0.2 Database migrations with Flyway</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">Why:</span> <code>ddl-auto=update</code> never drops or relaxes columns. It already broke Google sign-up once and needed hand-written fix scripts (<code>db/001…</code>, <code>db/002…</code>). Checkout will add several tables; they must be versioned.</p>
+    <p><span class="label">How:</span> add <code>spring-boot-starter-flyway</code>, dump the current schema as <code>V1__baseline.sql</code>, set <code>spring.flyway.baseline-on-migrate=true</code> for existing databases and switch Hibernate to <code>ddl-auto=validate</code>. Move the dev seed into <code>R__dev_seed.sql</code> (repeatable), loaded only in the dev profile.</p>
+    <div class="dw"><strong>Done when:</strong> a fresh database is built entirely by Flyway and the app starts with <code>validate</code>.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>0.3 An automated test safety net</h4><div class="chips"><span class="chip e">L</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">Why:</span> checkout and payments will touch money and stock; regressions there are costly. Today the backend has essentially one context-load test.</p>
+    <p><span class="label">How:</span> three layers:</p>
+    <ul>
+      <li><strong>Unit:</strong> <code>CartServiceImpl</code> rules (merge quantities, stock and line limits, currency guard), <code>AuthServiceImpl</code> (enumeration-safe login, reactivation).</li>
+      <li><strong>Web slice:</strong> <code>@WebMvcTest</code> + <code>spring-security-test</code> for every rule in <code>SecurityConfig</code>: anonymous → 401, customer on an admin endpoint → 403, users only ever see their own data.</li>
+      <li><strong>Integration:</strong> <code>@SpringBootTest</code> + <strong>Testcontainers PostgreSQL</strong> for repositories and the end-to-end cart → order flow.</li>
+    </ul>
+    <div class="dw"><strong>Done when:</strong> about 70% line coverage on the service layer, and every security rule has a test.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>0.4 Continuous integration</h4><div class="chips"><span class="chip e">S</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> a GitHub Actions workflow on every push and pull request: <code>./mvnw verify</code> on JDK 21, <code>npm ci &amp;&amp; ng test &amp;&amp; ng build</code>, a Docker image build, plus Dependabot and secret scanning. Pin the JDK to an LTS version (the JDK 27 / Lombok incident shows why).</p>
+    <div class="dw"><strong>Done when:</strong> the default branch is protected and pull requests can't merge while red.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>0.5 Rate limiting and brute-force protection</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">Why:</span> <code>/auth/login</code>, <code>/register</code> and <code>/reactivate</code> are public and currently unlimited, which invites credential-stuffing attacks.</p>
+    <p><span class="label">How:</span> Bucket4j filter keyed by IP and by email (for example 5 attempts per minute per email, 30 per IP), returning <code>429 Too Many Requests</code> with <code>Retry-After</code>. In-memory first, Redis-backed later (Phase 6). Add progressive account lockout using the existing <code>locked</code> flag, and record <code>SIGN_IN_FAILED</code> in the audit log.</p>
+    <div class="dw"><strong>Done when:</strong> a scripted brute-force run is throttled and visible in the audit log.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>0.6 Observability basics</h4><div class="chips"><span class="chip e">S</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> Spring Boot Actuator (<code>health</code>, <code>info</code>, <code>metrics</code>, exposed only internally); a request-ID filter that puts a correlation ID in the MDC and the <code>X-Request-Id</code> response header; JSON logs in prod (Spring Boot structured logging). Return the request ID in <code>ProblemDetail</code> so users can quote it to support.</p>
+    <div class="dw"><strong>Done when:</strong> any 500 error can be traced from the browser to a single log entry.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>0.7 Enforce module boundaries</h4><div class="chips"><span class="chip e">S</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> add <strong>Spring Modulith</strong> and a test that calls <code>ApplicationModules.of(ECommerceApplication.class).verify()</code>. It fails the build when, for example, the cart module reaches into the user module's repository. It can also generate C4/PlantUML module diagrams for the README.</p>
+  </div>
+</section>
+
+<!-- =============================== PHASE 1 =============================== -->
+<section class="section">
+  <span class="eyebrow">4 · Phase 1</span>
+  <div class="phase-head"><div class="phase-num">1</div><div><h2>Checkout &amp; orders</h2><p>The critical path: turn a cart into an order, safely.</p></div></div>
+  <div class="phase-meta"><span>Effort: XL (≈ 3–4 weeks)</span><span>Priority: Now</span><span>Depends on: Phase 0 (migrations, tests)</span></div>
+
+  <h3>The checkout flow</h3>
+  <svg viewBox="0 10 700 110" width="100%">
+    <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4f46e5"/></marker></defs>
+    <g font-size="10" text-anchor="middle">
+      <rect x="5" y="20" width="118" height="62" rx="10" fill="#eef2ff"/><text x="64" y="44" font-weight="700" fill="#312e81">1 · Review cart</text><text x="64" y="61" fill="#475569" font-size="8.5">fix unavailable lines</text>
+      <rect x="148" y="20" width="118" height="62" rx="10" fill="#eef2ff"/><text x="207" y="44" font-weight="700" fill="#312e81">2 · Address</text><text x="207" y="61" fill="#475569" font-size="8.5">pick or add shipping</text>
+      <rect x="291" y="20" width="118" height="62" rx="10" fill="#ede9fe"/><text x="350" y="44" font-weight="700" fill="#4c1d95">3 · Place order</text><text x="350" y="61" fill="#475569" font-size="8.5">validate · reserve stock</text><text x="350" y="73" fill="#475569" font-size="8.5">snapshot prices</text>
+      <rect x="434" y="20" width="118" height="62" rx="10" fill="#ede9fe"/><text x="493" y="44" font-weight="700" fill="#4c1d95">4 · Pay</text><text x="493" y="61" fill="#475569" font-size="8.5">Stripe (Phase 2)</text>
+      <rect x="577" y="20" width="118" height="62" rx="10" fill="#dcfce7"/><text x="636" y="44" font-weight="700" fill="#14532d">5 · Confirmed</text><text x="636" y="61" fill="#475569" font-size="8.5">email · cart cleared</text>
+      <line x1="123" y1="51" x2="146" y2="51" stroke="#4f46e5" stroke-width="1.6" marker-end="url(#ar2)"/>
+      <line x1="266" y1="51" x2="289" y2="51" stroke="#4f46e5" stroke-width="1.6" marker-end="url(#ar2)"/>
+      <line x1="409" y1="51" x2="432" y2="51" stroke="#4f46e5" stroke-width="1.6" marker-end="url(#ar2)"/>
+      <line x1="552" y1="51" x2="575" y2="51" stroke="#4f46e5" stroke-width="1.6" marker-end="url(#ar2)"/>
+      <text x="350" y="112" fill="#b91c1c" font-size="9">Payment fails or times out after 30 min → order CANCELED, reserved stock released</text>
+      <path d="M493 82 C493 100, 350 95, 350 102" fill="none" stroke="#ef4444" stroke-dasharray="3 3"/>
+    </g>
+  </svg>
+
+  <div class="idea">
+    <div class="idea-top"><h4>1.1 Place an order from the cart</h4><div class="chips"><span class="chip e">L</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> <code>POST /api/v1/orders</code> in one <code>@Transactional</code> method:</p>
+    <ol>
+      <li>Load the caller's cart (user id from the token, never the body); reject it if empty or <code>hasUnavailableItems</code>.</li>
+      <li>For each line, <strong>reserve stock atomically</strong> (1.2).</li>
+      <li>Create the <code>Order</code> with status <code>PENDING_PAYMENT</code> and an <code>OrderItem</code> per line that <strong>copies</strong> product name, unit price and currency (the price snapshot). Later price changes must never alter past orders.</li>
+      <li>Compute totals on the server (subtotal, shipping, tax, discount), clear the cart and publish an <code>OrderPlaced</code> event.</li>
+    </ol>
+    <p>Remove the legacy <code>OrderService.saveOrderToCart</code> and the <code>SAVED_TO_CART</code> status, which mixed the cart and order concepts.</p>
+    <div class="dw"><strong>Done when:</strong> an integration test places an order, stock drops, the cart is empty and a later price change leaves the order total unchanged.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>1.2 Concurrency-safe stock reservation</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">Why:</span> two customers buying the last unit at the same moment must not both succeed (overselling).</p>
+    <p><span class="label">How:</span> one conditional SQL update per line. The database guarantees only one of two concurrent buyers can take the last unit:</p>
+<pre><span class="k">@Modifying</span>
+<span class="k">@Query</span>(<span class="s">"UPDATE Product p SET p.stockQuantity = p.stockQuantity - :qty "</span>
+     + <span class="s">"WHERE p.productId = :id AND p.stockQuantity &gt;= :qty AND p.status = 'ACTIVE'"</span>)
+<span class="k">int</span> reserve(Integer id, <span class="k">int</span> qty);   <span class="c">// 0 rows updated → INSUFFICIENT_STOCK, roll back the whole order</span></pre>
+    <p>Alternatively, add <code>@Version</code> to <code>Product</code> (optimistic locking) and retry on conflict. Release stock (<code>+ qty</code>) when an order is cancelled or its payment expires (a scheduled job every 5 minutes).</p>
+    <div class="dw"><strong>Done when:</strong> a test with 20 parallel threads buying the last 5 units produces exactly 5 successes and stock never goes negative.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>1.3 Idempotent "Place order"</h4><div class="chips"><span class="chip e">S</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> the SPA sends an <code>Idempotency-Key</code> header (a UUID created when the checkout page opens). The server stores it with the order, with a unique constraint per customer. A double click or network retry returns the <em>same</em> order instead of creating two.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>1.4 Order lifecycle (state machine)</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> encode the allowed transitions in one place (an <code>OrderStatus.canTransitionTo(next)</code> method) and reject everything else with <code>409 INVALID_ORDER_TRANSITION</code>. Record each change in an <code>order_status_history</code> table and the audit log.</p>
+    <table>
+      <thead><tr><th>From</th><th>Allowed next states</th><th>Who / trigger</th></tr></thead>
+      <tr><td>PENDING_PAYMENT</td><td>CONFIRMED, CANCELED</td><td>Payment webhook / timeout / customer</td></tr>
+      <tr><td>CONFIRMED</td><td>IN_PROGRESS, CANCELED, ON_HOLD</td><td>Admin; customer cancel within 1 hour</td></tr>
+      <tr><td>IN_PROGRESS</td><td>COMPLETED, ON_HOLD</td><td>Admin (packed / shipped / delivered)</td></tr>
+      <tr><td>ON_HOLD</td><td>IN_PROGRESS, CANCELED</td><td>Admin</td></tr>
+      <tr><td>COMPLETED</td><td>REQUEST_REFUND</td><td>Customer within 14 days</td></tr>
+      <tr><td>REQUEST_REFUND</td><td>CANCELED (refunded), COMPLETED (rejected)</td><td>Admin + payment refund</td></tr>
+    </table>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>1.5 Shipping addresses</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> a new <code>address</code> table (customer, name, line 1/2, city, region, postal code, country, phone, default flag) with <code>/api/v1/users/me/addresses</code> CRUD. At checkout, <strong>copy</strong> the chosen address into the order (as an <code>@Embeddable</code> shipping address), so editing the address book never changes past orders. Reuse the existing <code>@ValidPhoneNumber</code>.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>1.6 Order pages and confirmation email</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> Angular checkout steps (review, address, confirm), an order detail page with a status timeline, and "cancel" / "request refund" buttons shown only when the transition is allowed. Send emails with <code>spring-boot-starter-mail</code> and Thymeleaf templates (order confirmation, shipped, refunded), triggered by domain events after the transaction commits (<code>@TransactionalEventListener</code>), so an email failure never rolls back an order. Use MailHog/Mailpit in dev.</p>
+  </div>
+
+  <h3>New API surface</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+    <tr><td>POST</td><td><code>/api/v1/orders</code></td><td>Place order from cart (Idempotency-Key)</td></tr>
+    <tr><td>GET</td><td><code>/api/v1/orders/{id}</code></td><td>Order detail: own orders only, otherwise 404</td></tr>
+    <tr><td>POST</td><td><code>/api/v1/orders/{id}/cancel</code></td><td>Customer cancel (state machine permitting)</td></tr>
+    <tr><td>POST</td><td><code>/api/v1/orders/{id}/refund-request</code></td><td>Request a refund with a reason</td></tr>
+    <tr><td>GET/POST/PUT/DELETE</td><td><code>/api/v1/users/me/addresses</code></td><td>Address book</td></tr>
+  </table>
+</section>
+
+<!-- =============================== PHASE 2 =============================== -->
+<section class="section">
+  <span class="eyebrow">5 · Phase 2</span>
+  <div class="phase-head"><div class="phase-num">2</div><div><h2>Payments</h2><p>Take real money, without ever touching card numbers.</p></div></div>
+  <div class="phase-meta"><span>Effort: L (≈ 2 weeks)</span><span>Priority: Now</span><span>Depends on: Phase 1</span></div>
+
+  <div class="callout"><strong>Golden rule:</strong> card data never reaches SmartCart's servers. With a hosted payment page (Stripe Checkout or Payment Element), the PCI DSS compliance burden drops to the lightest self-assessment questionnaire (SAQ A), instead of a full audit.</div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>2.1 Stripe payment flow</h4><div class="chips"><span class="chip e">L</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> after "Place order", the backend creates a Stripe <strong>Checkout Session</strong> (or PaymentIntent) for the server-computed total, stores its id on a new <code>payment</code> row (order, provider, provider reference, amount, currency, status) and returns the redirect URL. The customer pays on Stripe's page and comes back to <code>/checkout/success?order=…</code>. That page only <em>shows</em> a status: <strong>the order is confirmed by the webhook, never by the browser redirect</strong>, because a redirect can be faked.</p>
+    <div class="dw"><strong>Done when:</strong> paying with Stripe's test card <code>4242 4242 4242 4242</code> moves the order to CONFIRMED, and a declined test card leaves it PENDING_PAYMENT.</div>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>2.2 Secure, idempotent webhooks</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> <code>POST /api/v1/payments/webhook/stripe</code> is public but <strong>verifies the <code>Stripe-Signature</code> header</strong> against the webhook secret before reading anything. Store each processed event id in a <code>processed_webhook_event</code> table (unique key), because Stripe may deliver the same event more than once and it must be applied only once. Handle <code>checkout.session.completed</code>, <code>payment_intent.payment_failed</code> and <code>charge.refunded</code>. Test locally with <code>stripe listen --forward-to</code>.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>2.3 Refunds and payment-provider abstraction</h4><div class="chips"><span class="chip e">M</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> a <code>PaymentProvider</code> interface (<code>createPayment</code>, <code>refund</code>, <code>parseWebhook</code>) with a <code>StripePaymentProvider</code> implementation (Strategy pattern), so PayPal, Paymob (Egypt) or Tap/Telr (UAE) can be added without touching order code. Approving a refund calls <code>provider.refund</code>; the <code>charge.refunded</code> webhook then cancels the order and restocks the items.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>2.4 Cash on delivery</h4><div class="chips"><span class="chip e">S</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">Why:</span> still a popular payment method in Egypt and much of the region. <span class="label">How:</span> a <code>CodPaymentProvider</code> that confirms the order immediately with payment status <code>DUE</code>, marked <code>PAID</code> by an admin on delivery. A good proof that the abstraction in 2.3 works.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>2.5 Invoices</h4><div class="chips"><span class="chip e">S</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">How:</span> generate a PDF invoice per confirmed order (OpenPDF or Thymeleaf + Flying Saucer) with a sequential invoice number, downloadable from the order page and attached to the confirmation email.</p>
+  </div>
+</section>
+
+<!-- =============================== PHASE 3 =============================== -->
+<section class="section">
+  <span class="eyebrow">6 · Phase 3</span>
+  <div class="phase-head"><div class="phase-num">3</div><div><h2>Admin &amp; inventory</h2><p>Let the shop owner run the shop without touching the database.</p></div></div>
+  <div class="phase-meta"><span>Effort: XL (≈ 4 weeks)</span><span>Priority: Next</span><span>Depends on: Phases 1–2</span></div>
+
+  <div class="callout">The foundations already exist: the <code>ROLE_ADMIN</code> role, <code>AdminSeeder</code> and <code>@EnableMethodSecurity</code>. Admin endpoints live under <code>/api/v1/admin/**</code>, protected by a URL rule <em>and</em> <code>@PreAuthorize</code> on each service method.</div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>3.1 Product management (CRUD + images)</h4><div class="chips"><span class="chip e">L</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> create, edit, deactivate (soft delete: orders reference products) and duplicate products; manage categories and brands. Image upload via <code>multipart/form-data</code>, <strong>validating the real file type by its magic bytes, not the extension</strong>, capping the size (for example 2 MB), re-encoding with ImageIO to strip metadata, and storing several sizes (thumbnail, card, full). Every change is audited.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>3.2 Inventory module: a stock ledger</h4><div class="chips"><span class="chip e">L</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">Why:</span> today stock is a single number, so you can't tell <em>why</em> it changed. <span class="label">How:</span> fill the empty <code>inventory</code> module with a <code>stock_movement</code> table (product, delta, reason: <code>RESTOCK | SALE | RESERVATION_RELEASED | RETURN | ADJUSTMENT</code>, reference, actor, timestamp). Every stock change goes through <code>InventoryService</code>, which writes the movement and the new quantity in one transaction. The current stock is always explainable as the sum of the movements, the same principle accountants use.</p>
+ Add low-stock thresholds with alerts, and bulk restock via CSV with a dry-run preview.
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>3.3 Order management</h4><div class="chips"><span class="chip e">M</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> a filterable, paginated order list (status, date range, customer email, amount) and an order detail view with the allowed next statuses as buttons (from the state machine), internal notes, tracking number and carrier, refund approval and packing slip.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>3.4 Dashboard and reports</h4><div class="chips"><span class="chip e">M</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> KPI tiles (revenue today / 7 days / 30 days, orders, average order value, conversion = orders ÷ carts), a revenue-by-day chart, top products, low-stock list and recent orders. Use aggregate SQL queries (<code>GROUP BY date_trunc('day', created_at)</code>), cached for 5 minutes, plus CSV export of orders.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>3.5 Customer management</h4><div class="chips"><span class="chip e">M</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">How:</span> search customers; view profile, orders and activity log; lock or unlock accounts (the existing <code>locked</code> flag already revokes tokens instantly through <code>JwtFilter</code>); grant or revoke the admin role. Every admin action is audited with the admin's id: <em>who did what to whom</em>.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>3.6 Admin UI</h4><div class="chips"><span class="chip e">L</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> a lazy-loaded Angular feature area at <code>/admin</code> with its own layout (sidebar navigation), an <code>adminGuard</code> that checks the <code>ROLE_ADMIN</code> claim (UX only; the server enforces it), data tables with server-side sorting and paging, and reusing the existing theme, dark mode and toasts.</p>
+  </div>
+</section>
+
+<!-- =============================== PHASE 4 =============================== -->
+<section class="section">
+  <span class="eyebrow">7 · Phase 4</span>
+  <div class="phase-head"><div class="phase-num">4</div><div><h2>Customer experience</h2><p>Features that make people find, trust and come back.</p></div></div>
+  <div class="phase-meta"><span>Effort: XL (pick and choose)</span><span>Priority: Next</span><span>Depends on: Phase 1</span></div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>4.1 Catalogue filters and sorting</h4><div class="chips"><span class="chip e">M</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> filter by category, brand, price range and in-stock only; sort by price, newest and best-selling. Build the query from optional criteria with JPA <strong>Specifications</strong> (or Querydsl) rather than ever-longer repository method names. Keep filters in the URL so results can be shared.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>4.2 Reviews and ratings (verified purchase)</h4><div class="chips"><span class="chip e">M</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> only customers with a COMPLETED order containing the product can review it, once per product. A 1–5 rating plus text, admin moderation (hide, with the reason audited), and the average rating with count stored on the product and updated in the same transaction. This blocks fake reviews by design.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>4.3 Wishlist and price-drop alerts</h4><div class="chips"><span class="chip e">S</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> a heart icon on cards and product pages, and <code>/api/v1/users/me/wishlist</code>. Stores the price at the moment of saving; a nightly job emails "price dropped" or "back in stock" notices (opt-in, with one-click unsubscribe).</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>4.4 Guest cart, merged on sign-in</h4><div class="chips"><span class="chip e">M</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">Why:</span> requiring sign-in before "Add to cart" loses customers. <span class="label">How:</span> keep a guest cart in <code>localStorage</code> (product ids and quantities only, never prices). On sign-in, <code>POST /api/v1/cart/merge</code> adds each line through the existing <code>CartService.addItem</code>, so every stock and limit rule still applies, and reports any lines that couldn't be merged.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>4.5 Coupons and promotions</h4><div class="chips"><span class="chip e">L</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">How:</span> a <code>coupon</code> table (code, percent or fixed amount, minimum order, valid from/to, total and per-customer usage limits, eligible categories), validated at checkout on the server, with redemptions recorded atomically to prevent over-use. The discount is snapshotted into the order like prices are.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>4.6 Arabic language and right-to-left layout</h4><div class="chips"><span class="chip e">L</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">Why:</span> a natural fit for customers in Egypt and the Gulf. <span class="label">How:</span> Angular i18n (or Transloco for runtime switching), <code>dir="rtl"</code> with Bootstrap's RTL stylesheet, CSS logical properties (<code>margin-inline-start</code> instead of <code>margin-left</code>), locale-aware number, currency and date formats (EGP, AED), Arabic product names and descriptions (a translation table per product), and an Arabic-capable font (for example IBM Plex Sans Arabic or Cairo).</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>4.7 Product variants (size, colour) with SKUs</h4><div class="chips"><span class="chip e">XL</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">How:</span> split <code>Product</code> into a product (shared description and images) and <code>product_variant</code> rows (SKU, attributes, price, stock). The cart and orders then reference variants. A big migration: decide early.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>4.8 Small touches with big impact</h4><div class="chips"><span class="chip e">S each</span><span class="pill later">Later</span></div></div>
+    <ul style="columns: 2; column-gap: 8mm">
+      <li><strong>Recently viewed</strong> products (local, no backend)</li>
+      <li><strong>Order tracking</strong> page with carrier link and a status timeline</li>
+      <li><strong>Image gallery</strong> with zoom and multiple images per product</li>
+      <li><strong>Accessibility audit</strong> (axe / Lighthouse), aiming for WCAG 2.2 AA</li>
+      <li><strong>SEO:</strong> Angular SSR or prerendering for product pages, product structured data (JSON-LD), sitemap</li>
+    </ul>
+  </div>
+</section>
+
+<!-- =============================== PHASE 5 =============================== -->
+<section class="section">
+  <span class="eyebrow">8 · Phase 5</span>
+  <div class="phase-head"><div class="phase-num">5</div><div><h2>Identity &amp; security</h2><p>Close the remaining gaps from <code>docs/SECURITY.md</code> §7.</p></div></div>
+  <div class="phase-meta"><span>Effort: L (≈ 2–3 weeks)</span><span>Priority: Next</span><span>Depends on: Phase 0</span></div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>5.1 Email verification for local sign-up</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">Why:</span> Google accounts are linked by <em>verified</em> email, but local sign-ups are not verified at all. <span class="label">How:</span> an <code>email_verified</code> column. On sign-up, send a link containing a random 32-byte token, storing only its <strong>SHA-256 hash</strong>, valid for 24 hours and usable once. Unverified users can browse and fill a cart, but checkout requires verification.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>5.2 Forgot / reset password</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now</span></div></div>
+    <p><span class="label">How:</span> <code>POST /auth/forgot-password</code> <strong>always</strong> returns 202 (never reveals whether the email exists). The email contains a single-use hashed token valid for 30 minutes. A successful reset revokes all existing sessions (a <code>tokens_valid_after</code> timestamp checked in <code>JwtFilter</code>) and is recorded as <code>PASSWORD_RESET</code> in the audit log, with a notification email.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>5.3 Refresh tokens with rotation</h4><div class="chips"><span class="chip e">L</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> a short access token (10 minutes) plus a long refresh token (14 days) stored as an <strong>HttpOnly, Secure, SameSite=Strict cookie</strong>, with a hash kept in a <code>refresh_token</code> table (family id, device, expiry, revoked). Each refresh issues a new refresh token and revokes the old one. Reuse of a revoked token means it was stolen, so the whole token family is revoked (the reuse detection described in RFC 9700). The SPA then keeps the access token in memory instead of <code>localStorage</code>. Because a cookie is now involved, CSRF protection is re-enabled for <code>/auth/refresh</code>.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>5.4 Active sessions and "sign out everywhere"</h4><div class="chips"><span class="chip e">S</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> built on 5.3: list devices (browser, approximate location, last used) on the account page, with per-session and global sign-out. Pairs naturally with the existing activity page, plus "new sign-in from a new device" emails.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>5.5 Two-factor authentication (TOTP)</h4><div class="chips"><span class="chip e">M</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">How:</span> authenticator-app codes (RFC 6238) with a QR enrollment page, an encrypted secret at rest, 10 one-time recovery codes (hashed), and a two-step login (password → short-lived "mfa_pending" token → code → real token). Required for admins, optional for customers. Passkeys (WebAuthn) are a strong follow-up.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>5.6 More providers, key rotation and security headers</h4><div class="chips"><span class="chip e">M</span><span class="pill later">Later</span></div></div>
+    <ul>
+      <li><strong>More sign-in providers:</strong> Microsoft, GitHub or Apple. The <code>AuthProvider</code> enum and success handler are already provider-agnostic; only GitHub needs extra work, because it doesn't return <code>email_verified</code> the same way.</li>
+      <li><strong>Key rotation:</strong> a <code>kid</code> header plus a public <code>/.well-known/jwks.json</code> endpoint with current and previous public keys, enabling zero-downtime rotation and verification by future services.</li>
+      <li><strong>Security headers:</strong> Content-Security-Policy, HSTS, <code>X-Content-Type-Options</code>, <code>Referrer-Policy</code>, <code>Permissions-Policy</code>.</li>
+      <li><strong>Dependency scanning:</strong> OWASP Dependency-Check or Snyk in CI.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- =============================== PHASE 6 =============================== -->
+<section class="section">
+  <span class="eyebrow">9 · Phase 6</span>
+  <div class="phase-head"><div class="phase-num">6</div><div><h2>Performance &amp; scale</h2><p>Meet the README targets (API &lt; 500 ms, page load &lt; 2 s) as traffic grows.</p></div></div>
+  <div class="phase-meta"><span>Effort: L</span><span>Priority: Later</span><span>Depends on: Phase 0 (metrics), Phase 7 (deploy)</span></div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>6.1 Measure first: load tests</h4><div class="chips"><span class="chip e">S</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> k6 or Gatling scripts for browse → search → add to cart → checkout, run in CI against a staging environment, with thresholds (p95 &lt; 500 ms, error rate &lt; 1%). Find bottlenecks with Actuator metrics and SQL logging before optimising anything.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>6.2 Caching</h4><div class="chips"><span class="chip e">M</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">How:</span> start with an in-memory Caffeine cache for <code>@Cacheable</code> catalogue reads (categories, brands, product pages), evicted on admin updates. Move to <strong>Redis</strong> once there is more than one backend instance; it can also back rate limiting (0.5) and sessions. Never cache anything per-user, such as carts or profiles.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>6.3 Images to object storage and a CDN</h4><div class="chips"><span class="chip e">M</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">Why:</span> images are stored in PostgreSQL as <code>bytea</code> and served by the API. That works for 24 products but not for thousands. <span class="label">How:</span> S3-compatible storage (AWS S3, Cloudflare R2 or MinIO locally); admin uploads use pre-signed URLs; images are served from a CDN in WebP/AVIF at several sizes; <code>Product</code> stores only the image key. Provide a one-off migration from the <code>product_image</code> table.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>6.4 Better search</h4><div class="chips"><span class="chip e">M</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">How:</span> step 1 is PostgreSQL full-text search (a <code>tsvector</code> column with a GIN index, ranking by relevance, plus <code>pg_trgm</code> for typo tolerance), which needs no new infrastructure. Step 2, only if needed, is OpenSearch or Meilisearch fed by product events, adding autocomplete and facets.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>6.5 Events and the path to microservices</h4><div class="chips"><span class="chip e">L</span><span class="pill later">Later</span></div></div>
+    <p><span class="label">How:</span> modules communicate through domain events (<code>OrderPlaced</code>, <code>PaymentSucceeded</code>, <code>StockLow</code>). Spring Modulith's event publication registry provides a <strong>transactional outbox</strong>: events are saved in the same transaction as the business change and delivered reliably afterwards. When a module needs to scale independently (likely notifications or search first), externalise its events to Kafka or RabbitMQ and extract it as a service. This realises the Kafka saga sketched in the README's sequence diagram, without a big-bang rewrite.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>6.6 Query hygiene</h4><div class="chips"><span class="chip e">S</span><span class="pill next">Next</span></div></div>
+    <ul>
+      <li>Add the indexes the README already promises: <code>product(product_name)</code>, <code>product(category_id)</code>, <code>orders(customer_id, created_at)</code>, <code>audit_log(customer_id, created_at)</code></li>
+      <li>Use keyset pagination for the activity log and admin order lists (fast at any depth)</li>
+      <li>Run a Hibernate statistics test that fails if a request issues more than N queries (catches N+1 regressions)</li>
+      <li>Set an explicit HikariCP pool size and timeouts</li>
+    </ul>
+  </div>
+</section>
+
+<!-- =============================== PHASE 7 =============================== -->
+<section class="section">
+  <span class="eyebrow">10 · Phase 7</span>
+  <div class="phase-head"><div class="phase-num">7</div><div><h2>DevOps &amp; deployment</h2><p>From Docker Compose on a laptop to a public, monitored HTTPS site.</p></div></div>
+  <div class="phase-meta"><span>Effort: M–L</span><span>Priority: Next (deploy early, deploy often)</span><span>Depends on: Phase 0</span></div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>7.1 Continuous delivery pipeline</h4><div class="chips"><span class="chip e">M</span><span class="pill next">Next</span></div></div>
+    <p><span class="label">How:</span> extend the CI from 0.4: on merge to <code>master</code>, build versioned images (Git SHA tag), push them to GitHub Container Registry, deploy to <strong>staging</strong> automatically, run smoke tests plus the demo-video script as an end-to-end check, then promote to <strong>production</strong> with a manual approval. Flyway runs migrations on startup.</p>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>7.2 Hosting options</h4><div class="chips"><span class="chip e">M</span><span class="pill next">Next</span></div></div>
+    <table>
+      <thead><tr><th>Option</th><th>Good for</th><th>Notes</th></tr></thead>
+      <tr><td>Render / Railway / Fly.io</td><td>Portfolio and first customers</td><td>Deploys straight from Docker; managed Postgres; HTTPS included; lowest operational effort</td></tr>
+      <tr><td>A single VPS + Docker Compose + Caddy</td><td>Learning, low cost</td><td>Caddy handles automatic HTTPS; you manage backups and updates yourself</td></tr>
+      <tr><td>AWS (ECS Fargate + RDS + S3 + CloudFront) or Azure equivalents</td><td>Real production and scale</td><td>The most to learn; strong CV value; infrastructure as code with Terraform</td></tr>
+    </table>
+  </div>
+
+  <div class="idea">
+    <div class="idea-top"><h4>7.3 Production readiness checklist</h4><div class="chips"><span class="chip e">M</span><span class="pill now">Now (before go-live)</span></div></div>
+    <ul>
+      <li><strong>HTTPS everywhere</strong> with HSTS; update the Google OAuth redirect URI and CORS origin to the real domain</li>
+      <li><strong>Secrets</strong> in the platform's secret store, never in images; JWT keys mounted as files</li>
+      <li><strong>Automated daily database backups</strong> with a tested restore (a backup you've never restored isn't a backup)</li>
+      <li><strong>Monitoring:</strong> uptime check, Prometheus + Grafana (or the platform's built-in tooling), and error tracking with Sentry (backend and Angular)</li>
+      <li><strong>Alerts</strong> on error rate, p95 latency, failed payments and webhook failures</li>
+      <li><strong>Legal:</strong> privacy policy, terms and a cookie notice; GDPR-style data export and the existing account deletion</li>
+    </ul>
+  </div>
+</section>
+
+<!-- =============================== INNOVATION =============================== -->
+<section class="section">
+  <span class="eyebrow">11 · Beyond the basics</span>
+  <h2>Innovation ideas</h2>
+  <p class="intro">Ideas that would make SmartCart stand out as a portfolio project, ordered roughly from simplest to most ambitious.</p>
+
+  <div class="grid2">
+    <div class="card"><h4>"Frequently bought together"</h4><p>Count product pairs that appear in the same orders (a nightly SQL job) and show the top 3 on product and cart pages. Simple, explainable and effective; no machine learning needed to start.</p><span class="chip e">M</span></div>
+    <div class="card"><h4>Abandoned-cart reminders</h4><p>A carts table with <code>updated_at</code> is already there. Email customers whose cart has been idle for 24 hours (opt-in, at most one reminder), and track recovered revenue on the dashboard.</p><span class="chip e">S</span></div>
+    <div class="card"><h4>Installable PWA</h4><p>Angular service worker and a web manifest: installable on phones, cached catalogue pages, offline fallback, and later web push for order status updates.</p><span class="chip e">M</span></div>
+    <div class="card"><h4>Loyalty points and gift cards</h4><p>Earn points per completed order (recorded in a ledger table, like inventory), redeem them at checkout; gift cards as prepaid codes. Both reuse the coupon and ledger patterns from Phases 3–4.</p><span class="chip e">L</span></div>
+    <div class="card"><h4>AI product descriptions for admins</h4><p>In the admin product editor, "Generate description" sends the product name, attributes and image to an LLM API (for example Claude) and returns a draft in English and Arabic for the admin to edit. Always human-reviewed; the API key stays on the server.</p><span class="chip e">M</span></div>
+    <div class="card"><h4>Semantic search</h4><p>Store an embedding per product (<code>pgvector</code> in the same PostgreSQL) so queries like "something to keep coffee warm on a hike" find the insulated bottle. Combine it with keyword search for the best of both.</p><span class="chip e">L</span></div>
+    <div class="card"><h4>Shopping assistant chat</h4><p>A chat panel backed by an LLM with <strong>tool use</strong>: it can call your own read-only APIs (search products, check stock, look up the caller's order status). It must never take actions on its own and must respect the same authorization as the user.</p><span class="chip e">XL</span></div>
+    <div class="card"><h4>Experimentation</h4><p>Feature flags (for example Unleash or a simple flags table) plus A/B tests on the hero, product card layout or checkout steps, measured by conversion on the dashboard.</p><span class="chip e">M</span></div>
+  </div>
+
+  <div class="callout warn" style="margin-top:5mm"><strong>AI features checklist:</strong> keep API keys server-side; rate-limit per user; never send personal data the feature doesn't need; show AI output as a draft or suggestion; log prompts and outputs for review; give users a non-AI fallback.</div>
+</section>
+
+<!-- =============================== MATRIX =============================== -->
+<section class="section">
+  <span class="eyebrow">12 · Prioritisation</span>
+  <h2>Value vs effort</h2>
+  <p class="intro">Each idea is placed by its user or business value and its effort. Start top-left (high value, low effort), schedule top-right deliberately, and leave the bottom-right for last.</p>
+
+  <svg viewBox="0 0 700 410" width="100%" style="margin:2mm 0 4mm">
+    <rect x="70" y="10" width="300" height="180" fill="#ecfdf5"/><rect x="370" y="10" width="320" height="180" fill="#eef2ff"/>
+    <rect x="70" y="190" width="300" height="180" fill="#f8fafc"/><rect x="370" y="190" width="320" height="180" fill="#fef2f2"/>
+    <g font-size="10" font-weight="800" fill="#475569" letter-spacing="1">
+      <text x="80" y="28">QUICK WINS — DO NOW</text><text x="380" y="28">BIG BETS — PLAN CAREFULLY</text>
+      <text x="80" y="208">FILL-INS — WHEN TIME ALLOWS</text><text x="380" y="208">QUESTIONABLE — DEFER</text>
+    </g>
+    <text x="380" y="398" font-size="11" font-weight="700" fill="#0f172a" text-anchor="middle">Effort →</text>
+    <text x="22" y="190" font-size="11" font-weight="700" fill="#0f172a" transform="rotate(-90 22 190)" text-anchor="middle">Value →</text>
+    <g font-size="9.5" font-weight="600" fill="#0f172a">
+      <circle cx="95" cy="55" r="5" fill="#4f46e5"/><text x="105" y="59">0.1 Rotate secrets</text>
+      <circle cx="105" cy="80" r="5" fill="#4f46e5"/><text x="115" y="84">0.4 CI pipeline</text>
+      <circle cx="210" cy="60" r="5" fill="#4f46e5"/><text x="220" y="64">0.5 Rate limiting</text>
+      <circle cx="225" cy="105" r="5" fill="#4f46e5"/><text x="235" y="109">0.2 Flyway</text>
+      <circle cx="120" cy="130" r="5" fill="#4f46e5"/><text x="130" y="134">1.3 Idempotency</text>
+      <circle cx="250" cy="150" r="5" fill="#4f46e5"/><text x="260" y="154">5.2 Password reset</text>
+      <circle cx="140" cy="165" r="5" fill="#4f46e5"/><text x="150" y="169">Abandoned cart</text>
+
+      <circle cx="430" cy="50" r="5" fill="#7c3aed"/><text x="440" y="54">1.1 Checkout</text>
+      <circle cx="520" cy="72" r="5" fill="#7c3aed"/><text x="530" y="76">2.1 Stripe payments</text>
+      <circle cx="400" cy="100" r="5" fill="#7c3aed"/><text x="410" y="104">0.3 Test safety net</text>
+      <circle cx="560" cy="120" r="5" fill="#7c3aed"/><text x="570" y="124">3.1 Admin products</text>
+      <circle cx="455" cy="145" r="5" fill="#7c3aed"/><text x="465" y="149">4.6 Arabic / RTL</text>
+      <circle cx="600" cy="165" r="5" fill="#7c3aed"/><text x="590" y="169" text-anchor="end">3.2 Stock ledger</text>
+
+      <circle cx="100" cy="240" r="5" fill="#64748b"/><text x="110" y="244">4.3 Wishlist</text>
+      <circle cx="190" cy="270" r="5" fill="#64748b"/><text x="200" y="274">2.5 Invoices</text>
+      <circle cx="120" cy="300" r="5" fill="#64748b"/><text x="130" y="304">Recently viewed</text>
+      <circle cx="240" cy="325" r="5" fill="#64748b"/><text x="250" y="329">5.4 Sessions list</text>
+
+      <circle cx="440" cy="240" r="5" fill="#ef4444"/><text x="450" y="244">4.7 Variants (unless needed)</text>
+      <circle cx="560" cy="275" r="5" fill="#ef4444"/><text x="570" y="279">AI chat assistant</text>
+      <circle cx="470" cy="310" r="5" fill="#ef4444"/><text x="480" y="314">6.5 Microservices</text>
+      <circle cx="600" cy="340" r="5" fill="#ef4444"/><text x="590" y="344" text-anchor="end">OpenSearch cluster</text>
+    </g>
+    <rect x="70" y="10" width="620" height="360" fill="none" stroke="#cbd5e1"/>
+    <line x1="370" y1="10" x2="370" y2="370" stroke="#cbd5e1"/><line x1="70" y1="190" x2="690" y2="190" stroke="#cbd5e1"/>
+  </svg>
+
+  <table>
+    <thead><tr><th>Rank</th><th>Idea</th><th>Why now</th></tr></thead>
+    <tr><td>1</td><td>0.1 Rotate secrets · 0.2 Flyway · 0.4 CI</td><td>Cheap, and they remove risks that grow with every commit</td></tr>
+    <tr><td>2</td><td>0.3 Tests · 0.5 Rate limiting</td><td>Safety net needed before touching money</td></tr>
+    <tr><td>3</td><td>1.1–1.6 Checkout &amp; orders</td><td>The one missing piece of the core shopping flow</td></tr>
+    <tr><td>4</td><td>2.1–2.2 Stripe + webhooks</td><td>Turns orders into revenue</td></tr>
+    <tr><td>5</td><td>5.1–5.2 Verify email · Password reset</td><td>Expected by every real user; required before launch</td></tr>
+    <tr><td>6</td><td>7.1–7.3 Deploy + production checklist</td><td>Go live on a real domain</td></tr>
+    <tr><td>7</td><td>3.x Admin &amp; inventory</td><td>The owner can run the shop without SQL</td></tr>
+    <tr><td>8</td><td>4.x Experience, then 6.x scale and innovation</td><td>Growth and differentiation</td></tr>
+  </table>
+</section>
+
+<!-- =============================== TIMELINE =============================== -->
+<section class="section">
+  <span class="eyebrow">13 · Timeline</span>
+  <h2>A six-month plan</h2>
+  <p class="intro">Two-week sprints for one developer, starting November 2026. Phases overlap where they don't depend on each other. Treat the dates as a guide and re-plan at the end of every sprint.</p>
+
+  <table class="gantt">
+    <thead><tr><th></th><th>Nov</th><th></th><th>Dec</th><th></th><th>Jan</th><th></th><th>Feb</th><th></th><th>Mar</th><th></th><th>Apr</th><th></th></tr>
+    <tr><th></th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>S6</th><th>S7</th><th>S8</th><th>S9</th><th>S10</th><th>S11</th><th>S12</th></tr></thead>
+    <tr><td class="name">0 · Foundations</td><td class="cell" colspan="2"><div class="bar b0" style="left:0;right:0"></div></td><td class="cell" colspan="10"></td></tr>
+    <tr><td class="name">1 · Checkout &amp; orders</td><td class="cell" colspan="2"></td><td class="cell" colspan="4"><div class="bar b1" style="left:0;right:0"></div></td><td class="cell" colspan="6"></td></tr>
+    <tr><td class="name">2 · Payments</td><td class="cell" colspan="5"></td><td class="cell" colspan="2"><div class="bar b2" style="left:0;right:0"></div></td><td class="cell" colspan="5"></td></tr>
+    <tr><td class="name">5 · Identity (5.1–5.3)</td><td class="cell" colspan="6"></td><td class="cell" colspan="2"><div class="bar b4" style="left:0;right:0"></div></td><td class="cell" colspan="4"></td></tr>
+    <tr><td class="name">7 · Deploy &amp; go-live</td><td class="cell" colspan="3"></td><td class="cell" colspan="1"><div class="bar b6" style="left:10%;right:10%;opacity:.55"></div></td><td class="cell" colspan="3"></td><td class="cell" colspan="2"><div class="bar b6" style="left:0;right:0"></div></td><td class="cell" colspan="3"></td></tr>
+    <tr><td class="name">3 · Admin &amp; inventory</td><td class="cell" colspan="8"></td><td class="cell" colspan="3"><div class="bar b3" style="left:0;right:0"></div></td><td class="cell" colspan="1"></td></tr>
+    <tr><td class="name">4 · Experience</td><td class="cell" colspan="9"></td><td class="cell" colspan="3"><div class="bar b5" style="left:0;right:0"></div></td></tr>
+    <tr><td class="name">6 · Scale &amp; innovation</td><td class="cell" colspan="11"></td><td class="cell" colspan="1"><div class="bar b7" style="left:0;right:0"></div></td></tr>
+  </table>
+  <p class="small">The faded bar in S4 is an early staging deployment: deploy early so infrastructure problems surface before launch.</p>
+
+  <h3>Milestones</h3>
+  <table>
+    <thead><tr><th style="width:30mm">When</th><th>Milestone</th><th>Demo</th></tr></thead>
+    <tr><td>End of S2 (Nov)</td><td><strong>M0, Solid ground:</strong> migrations, CI green, secrets rotated, rate limiting</td><td>Pull request blocked by a failing test</td></tr>
+    <tr><td>End of S6 (Jan)</td><td><strong>M1, First order:</strong> checkout with stock reservation and order emails</td><td>Place an order; stock drops; email arrives</td></tr>
+    <tr><td>End of S7 (Feb)</td><td><strong>M2, First payment:</strong> Stripe test mode end to end</td><td>Pay with a test card; webhook confirms the order</td></tr>
+    <tr><td>End of S9 (Mar)</td><td><strong>M3, Go-live (v1.0):</strong> production deploy, verification, password reset</td><td>Public HTTPS URL; new demo video</td></tr>
+    <tr><td>End of S11 (Apr)</td><td><strong>M4, Self-service shop:</strong> admin panel and inventory</td><td>Add a product, fulfil an order without SQL</td></tr>
+    <tr><td>End of S12 (Apr)</td><td><strong>M5, v2.0:</strong> filters, reviews, Arabic, first innovation feature</td><td>Arabic RTL storefront walkthrough</td></tr>
+  </table>
+</section>
+
+<!-- =============================== METRICS & RESOURCES =============================== -->
+<section class="section">
+  <span class="eyebrow">14 · Measuring success</span>
+  <h2>Success metrics</h2>
+  <div class="grid2">
+    <div class="card">
+      <h4>Product metrics</h4>
+      <ul>
+        <li><strong>Checkout conversion:</strong> orders ÷ carts with items (target: track a baseline first, then improve)</li>
+        <li><strong>Order success rate:</strong> confirmed ÷ placed orders &gt; 95%</li>
+        <li><strong>Cart abandonment</strong> and recovery from reminders</li>
+        <li><strong>Average order value</strong> and repeat-customer rate</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Engineering metrics</h4>
+      <ul>
+        <li><strong>API latency:</strong> p95 &lt; 500 ms (README goal)</li>
+        <li><strong>Error rate:</strong> &lt; 0.5% of requests return a 5xx</li>
+        <li><strong>Zero oversold orders</strong> (stock ledger audit)</li>
+        <li><strong>Test coverage:</strong> ≥ 70% services; 100% of security rules</li>
+        <li><strong>Deploy frequency</strong> and time to restore after an incident</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:4mm"><strong>Next step:</strong> turn Phase 0 into GitHub issues (one per idea, with the "Done when" line as the acceptance criteria), group them into a "Sprint 1" milestone, and start with 0.1, rotating the leaked secrets.</div>
+
+  <h3>Learning resources by phase</h3>
+  <table>
+    <thead><tr><th style="width:36mm">Topic</th><th>Resource</th></tr></thead>
+    <tr><td>Flyway migrations</td><td>Spring Boot reference, "Database Initialization" · documentation.red-gate.com/fd</td></tr>
+    <tr><td>Testing</td><td>Spring Boot reference, "Testing" · testcontainers.com/guides</td></tr>
+    <tr><td>Module boundaries</td><td>Spring Modulith reference: docs.spring.io/spring-modulith</td></tr>
+    <tr><td>Rate limiting</td><td>Bucket4j documentation: bucket4j.com</td></tr>
+    <tr><td>Concurrency &amp; locking</td><td>Vlad Mihalcea, <em>High-Performance Java Persistence</em> · PostgreSQL docs, "Concurrency Control"</td></tr>
+    <tr><td>Payments</td><td>Stripe docs: Checkout, Webhooks (signature verification), Testing · PCI DSS SAQ A overview</td></tr>
+    <tr><td>Identity</td><td>OWASP cheat sheets: Forgot Password, Multifactor Authentication · RFC 9700 (OAuth 2.0 security) · RFC 6238 (TOTP)</td></tr>
+    <tr><td>Event-driven design</td><td>microservices.io, "Transactional outbox" and "Saga" patterns (Chris Richardson)</td></tr>
+    <tr><td>Domain modelling</td><td>Vaughn Vernon, <em>Domain-Driven Design Distilled</em> · Eric Evans, <em>Domain-Driven Design</em></td></tr>
+    <tr><td>Internationalisation</td><td>Angular docs, "Internationalization" · Bootstrap docs, "RTL"</td></tr>
+    <tr><td>Deployment &amp; operations</td><td>The Twelve-Factor App (12factor.net) · Google SRE book (sre.google/books)</td></tr>
+  </table>
+
+
+</section>
+
+</body>
+</html>

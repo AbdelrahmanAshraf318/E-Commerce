@@ -4,8 +4,22 @@
     {
       "name": "frontend",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "frontend/eCommerce-client", "start"],
+      "runtimeArgs": [
+        "--prefix",
+        "frontend/eCommerce-client",
+        "start"
+      ],
       "port": 4200
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-Command",
+        "Set-Location backend/eCommerce; ./mvnw.cmd spring-boot:run"
+      ],
+      "port": 8080
     }
   ]
 }

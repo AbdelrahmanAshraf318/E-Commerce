@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, switchMap, tap } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 import { API_URL } from './config';
-import { ChangePasswordRequest, CustomerProfile, UpdateProfileRequest } from './models';
+import { ActivityEntry, ChangePasswordRequest, CustomerOrder, CustomerProfile, Page, UpdateProfileRequest } from './models';
 
 /** /api/v1/users/me/** - the signed-in customer's own account. */
 @Injectable({ providedIn: 'root' })
@@ -29,5 +29,16 @@ export class CustomerService {
 
   deleteAccount(): Observable<void> {
     return this.http.delete<void>(this.baseUrl);
+  }
+
+  /** Newest first. */
+  getOrders(): Observable<CustomerOrder[]> {
+    return this.http.get<CustomerOrder[]>(`${this.baseUrl}/orders`);
+  }
+
+  /** The account's audit log, newest first. `page` is zero-based. */
+  getActivity(page = 0, size = 20): Observable<Page<ActivityEntry>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<Page<ActivityEntry>>(`${this.baseUrl}/activity`, { params });
   }
 }
